@@ -7,7 +7,7 @@ library(stringr)
 
 
 # Loading data into R
-bbga_data <- read.csv("data_files/bbga_data.csv", sep = ";", stringsAsFactors = FALSE) 
+bbga_data <- read.csv("data_files/bbga_data.csv", sep = ";", stringsAsFactors = FALSE)
 bbga_metadata <- read_xlsx("data_files/bbga_additional_metadata.xlsx", sheet = 2)
 bbga_additional <- read_xlsx("data_files/bbga_additional_metadata.xlsx", sheet = 1)
 
@@ -22,8 +22,7 @@ temp_location_data <- temp_location_data[which(temp_location_data$niveau == 2 | 
 # Only 'location niveau; 8' and remove NA rows
 temp_location_8 <- na.omit(temp_location_data[which(temp_location_data == 8),])
 # Only 'gebiedscode15; Buurten' 
-bbga_data <- bbga_data[grep('[A-Z][0-9]{2}[a-z]', bbga_data$gebiedcode15),]
-
+facts <- facts[grep('[A-Z][0-9]{2}[a-z]', facts$gebiedcode15),]
 
 # Loading data in statistics 
 statistics <- data.frame("theme_name" = bbga_metadata$THEMA,
@@ -37,7 +36,14 @@ locations <- data.frame("district_code",
                         "quarter_name",
                         "neighbourhood_code",
                         "neighbourhood_name", stringsAsFactors = FALSE)
-colnames(locations) <- c("district_code", "district_name", "quarter_code", "quarter_name", "neighbourhood_code", "neighbourhood_name") 
+
+colnames(locations) <- c("district_code", 
+                         "district_name", 
+                         "quarter_code", 
+                         "quarter_name", 
+                         "neighbourhood_code", 
+                         "neighbourhood_name") 
+
 # loop for extracting district_code and quarter_code, while also assigning the corresponding 'gebiedsnaam' 
 for(i in 1:nrow(temp_location_8)) {
   district_code <- str_extract(temp_location_8[i,]$gebiedcode15, "[A-Z]")
@@ -59,3 +65,4 @@ facts <- transform(facts, gebiedcode15 = match(facts$gebiedcode15, locations$nei
 facts$version <- 1
 facts <- facts[, c(3, 2, 4, 1, 5)]
 colnames(facts) <- c("statistics_id", "locations_id", "value", "year", "version")
+facts <- facts[complete.cases(facts),]
