@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ggplot2)\n\nfunction(input, output, session) {\n  \n  # Combine the selected variables into a new data frame\n  output$plot1 <- renderPlot({\n    \n    if(is.na(input)){\n      itemx <- statistics[statistics$variable == input$xcol, ]\n      itemy <- statistics[statistics$variable == input$ycol, ]\n      location <- locations[locations$neighbourhood_name == input$lcol, ]\n      \n      av_variables_id <- unique(facts[which(facts$locations_id == location$location_id), 1])\n      av_variables <- statistics[av_variables_id, 3]\n      \n      result <- data.frame(x = facts[which(facts$statistics_id == itemx$statistic_id & facts$locations_id == location$location_id), 3])\n      result <- cbind(result, y = facts[which(facts$statistics_id == itemy$statistic_id & facts$locations_id == location$location_id), 3])\n      \n      ggplot(result, aes(x = x, y = y)) +\n        geom_point() +\n        xlab(itemx$variable) +\n        ylab(itemy$variable) +\n        ggtitle(location$neighbourhood_name)\n    \n    }\n    \n  })\n  \n}",
+    "created" : 1507987743903.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2823436486",
+    "id" : "E360A7F",
+    "lastKnownWriteTime" : 1507989072,
+    "last_content_update" : 1507989072949,
+    "path" : "~/Projects/R/Gemeente_Amsterdam_Groep_3/Gemeente Amsterdam Visuals/server.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
