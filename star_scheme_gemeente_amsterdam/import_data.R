@@ -22,7 +22,7 @@ temp_location_data <- temp_location_data[which(temp_location_data$niveau == 2 | 
 # Only 'location niveau; 8' and remove NA rows
 temp_location_8 <- na.omit(temp_location_data[which(temp_location_data == 8),])
 # Only 'gebiedscode15; Buurten' 
-bbga_data <- bbga_data[grep('[A-Z][0-9]{2}[a-z]', bbga_data$gebiedcode15),]
+facts <- facts[grep('[A-Z][0-9]{2}[a-z]', facts$gebiedcode15),]
 
 
 # Loading data in statistics 
@@ -53,9 +53,13 @@ for(i in 1:nrow(temp_location_8)) {
   )
 }
 
+locations$locations_id <- 1: nrow(locations)
+statistics$statistics_id <- 1 : nrow(statistics)
+
 # Loading data in facts
 facts <- transform(facts, variabele = match(facts$variabele, statistics$statistics_variable))
 facts <- transform(facts, gebiedcode15 = match(facts$gebiedcode15, locations$neighbourhood_code))
 facts$version <- 1
 facts <- facts[, c(3, 2, 4, 1, 5)]
 colnames(facts) <- c("statistics_id", "locations_id", "value", "year", "version")
+facts <- facts[complete.cases(facts), ]
