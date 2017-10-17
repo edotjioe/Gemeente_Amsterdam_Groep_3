@@ -13,6 +13,8 @@ locations <- locations %>% slice(match(buurten_map$Buurt_code, locations$neighbo
 temp <- facts[which(facts$year == 2017 & facts$statistics_id == 1), ]
 
 map_fact <- data.frame(locations, value = temp[match(locations$locations_id, temp$locations_id), "value"])
+
+rm(temp)
   
 pal <- colorNumeric("viridis", NULL)
 
