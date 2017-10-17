@@ -1,9 +1,13 @@
 #install.packages("readxl")
 #install.packages("dplyr")
 #install.packages("stringr")
+#install.packages("DBI")
+#install.packages("RMySQL")
 library(readxl)
 library(dplyr)
 library(stringr)
+library(DBI)
+library(RMySQL)
 
 
 # Loading data into R
@@ -28,7 +32,7 @@ facts <- facts[grep('[A-Z][0-9]{2}[a-z]', facts$gebiedcode15),]
 # Loading data in statistics 
 statistics <- data.frame("theme_name" = bbga_metadata$THEMA,
                          "statistics_variable" = toupper(bbga_metadata$Variabele),
-                         "statustics_unit" = bbga_metadata$Rekeneenheid, stringsAsFactors = FALSE)
+                         "statistics_unit" = bbga_metadata$Rekeneenheid, stringsAsFactors = FALSE)
 
 # Loading data in locations
 locations <- data.frame("district_code", 
@@ -53,9 +57,6 @@ for(i in 1:nrow(temp_location_8)) {
   )
 }
 
-locations$locations_id <- 1: nrow(locations)
-statistics$statistics_id <- 1 : nrow(statistics)
-
 # Loading data in facts
 facts <- transform(facts, variabele = match(facts$variabele, statistics$statistics_variable))
 facts <- transform(facts, gebiedcode15 = match(facts$gebiedcode15, locations$neighbourhood_code))
@@ -63,3 +64,45 @@ facts$version <- 1
 facts <- facts[, c(3, 2, 4, 1, 5)]
 colnames(facts) <- c("statistics_id", "locations_id", "value", "year", "version")
 facts <- facts[complete.cases(facts), ]
+
+
+# Data transfer to SQL datawarehouse 
+con <- dbConnect(RMySQL::MySQL(), 
+                 dbname = "zbekhofl001",
+                 host = "oege.ie.hva.nl", 
+                 user = "bekhofl001", 
+                 password = "ovv2atL4IgRBjd", 
+                 client.flag = CLIENT_MULTI_STATEMENTS)
+#dbListTables(con)
+  
+# Writing data to database
+dbWriteTable(con, "locations", locations, overwrite = TRUE)
+dbWriteTable(con, "statistics", statistics, overwrite = TRUE)
+dbWriteTable(con, "facts", facts, overwrite = TRUE)
+  
+  
+# Alteration of the tables (necessary)
+dbSendQuery(con, "ALTER TABLE locations
+  CHANGE COLUMN row_names locations_id BIGINT PRIMARY KEY,
+  CHANGE COLUMN district_code district_code TEXT NOT NULL,
+  CHANGE COLUMN district_name district_name TEXT NOT NULL,
+  CHANGE COLUMN quarter_code quarter_code TEXT NOT NULL,
+  CHANGE COLUMN quarter_name quarter_name TEXT NOT NULL,
+  CHANGE COLUMN neighbourhood_code neighbourhood_code TEXT NOT NULL,
+  CHANGE COLUMN neighbourhood_name neighbourhood_name TEXT NOT NULL")
+dbSendQuery(con, "ALTER TABLE statistics
+  CHANGE COLUMN row_names statistics_id BIGINT PRIMARY KEY,
+  CHANGE COLUMN theme_name theme_name TEXT NOT NULL,
+  CHANGE COLUMN statistics_variable statistics_variable TEXT NOT NULL,
+  CHANGE COLUMN statistics_unit statistics_unit SMALLINT NOT NULL")
+dbSendQuery(con, "ALTER TABLE facts
+  CHANGE COLUMN row_names facts_id BIGINT PRIMARY KEY,
+  CHANGE COLUMN statistics_id statistics_id BIGINT NOT NULL,
+  CHANGE COLUMN locations_id locations_id BIGINT NOT NULL,
+  CHANGE COLUMN value value DOUBLE NOT NULL,
+  CHANGE COLUMN year year SMALLINT NOT NULL,
+  ADD FOREIGN KEY (statistics_id) REFERENCES statistics(statistics_id),
+  ADD FOREIGN KEY (locations_id) REFERENCES locations(locations_id)")
+
+# Disconnect from connection
+dbDisconnect(con)
