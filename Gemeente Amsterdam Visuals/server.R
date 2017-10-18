@@ -28,6 +28,25 @@ function(input, output, session) {
     dbDisconnect(con)
   }
   
+  # Combine the selected variables into a new data frame
+  output$map <- renderLeaflet({
+    pal <- colorNumeric("viridis", NULL)
+    
+    leaflet(data = buurten_map) %>%
+      addTiles() %>%
+      addPolygons(stroke = TRUE, 
+                  weight = 2, 
+                  smoothFactor = 1, 
+                  fillOpacity = 0.7, 
+                  color = "white",
+                  fillColor = ~pal(log10(map_fact$value)),
+                  highlightOptions = highlightOptions(color = "red", 
+                                                      weight = 3,
+                                                      bringToFront = TRUE), 
+                  label = paste(locations$neighbourhood_name, " - ", map_fact$value)) %>%
+      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9)
+  })
+  
   observe({
     temp <- paste("SELECT * FROM facts WHERE year = ", input$year, " AND statistics_id = ", 
                   statistics[statistics$statistics_variable == input$stat, 1])
@@ -54,35 +73,24 @@ function(input, output, session) {
                   weight = 2, 
                   smoothFactor = 1, 
                   fillOpacity = 0.7, 
-                  color = "red",
+                  color = "white",
                   fillColor = ~pal(map_fact$value),
-                  highlightOptions = highlightOptions(color = "white", 
+                  highlightOptions = highlightOptions(color = "red", 
                                                       weight = 3,
                                                       bringToFront = TRUE), 
                   label = paste(map_fact$neighbourhood_name, " - ", map_fact$value)) %>%
-      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9,
-                labFormat = labelFormat(transform = function(x) round(10^x)))
+      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9)
   })
   
-  
-  # Combine the selected variables into a new data frame
-  output$map <- renderLeaflet({
-    pal <- colorNumeric("viridis", NULL)
-    
-    leaflet(data = buurten_map) %>%
-      addTiles() %>%
-      addPolygons(stroke = TRUE, 
-                  weight = 2, 
-                  smoothFactor = 1, 
-                  fillOpacity = 0.7, 
-                  color = "red",
-                  fillColor = ~pal(log10(map_fact$value)),
-                  highlightOptions = highlightOptions(color = "white", 
-                                                      weight = 3,
-                                                      bringToFront = TRUE), 
-                  label = paste(locations$neighbourhood_name, " - ", map_fact$value)) %>%
-      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9,
-                labFormat = labelFormat(transform = function(x) round(10^x)))
+  observeEvent(input$Map_shape_click, { # update the location selectInput on map clicks
+    p <- input$Map_shape_click
+    if(is.null(click))
+      return()
+    text<-paste("Lattitude ", click$lat, "Longtitude ", click$lng)
+    text2<-paste("You've selected point ", click$id)
+    leafletProxy("popup") %>%
+      clearPopups() %>%
+      addPopups( p$lat, p$lng, "text")
   })
   
 }
