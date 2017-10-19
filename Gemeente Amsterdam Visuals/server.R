@@ -92,15 +92,15 @@ function(input, output, session) {
     )
   })
   
-  observeEvent(input$Map_shape_click, { # update the location selectInput on map clicks
-    p <- input$Map_shape_click
-    if(is.null(click))
+  observeEvent(input$map_shape_click, { # update the location selectInput on map clicks
+    p <- input$map_shape_click
+    if(is.null(p))
       return()
-    text<-paste("Lattitude ", click$lat, "Longtitude ", click$lng)
-    text2<-paste("You've selected point ", click$id)
+    text<-paste("Lattitude ", p$lat, "Longtitude ", p$lng)
+    text2<-paste("You've selected point ", p$id)
     leafletProxy("map") %>%
       clearPopups() %>%
-      addPopups( p$lat, p$lng, "text")
+      addPopups( p$lat, p$lng, text)
   })
   
 }

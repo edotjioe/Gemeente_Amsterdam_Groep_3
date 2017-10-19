@@ -20,15 +20,16 @@ ui <- dashboardPage( skin = "red",
                h2("Dashboard")
       ),
       tabItem( tabName = "map",
+               
         fluidRow(
-          leafletOutput("map", width = "100%", height = "900px"),
-            leafletOutput("popup"),
+            tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
+            leafletOutput("map", width = "100%"),
     
             absolutePanel(id = "control", top = 700, right = 50,
                           selectInput("stat", "Select statistic", statistics[, 3]),
                           sliderInput("year", "Select year", 2005, 2017, 2017, step = 1)
             ),
-            tags$style(type='text/css', ".selectize-dropdown-content {max-height: 150px; }")
+          tags$style(type='text/css', ".selectize-dropdown-content {max-height: 150px; }")
          )
       ),
       tabItem( tabName = "subchart1",
