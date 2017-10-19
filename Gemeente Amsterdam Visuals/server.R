@@ -47,6 +47,9 @@ function(input, output, session) {
       addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = statistics[1,3])
   })
   
+  # Table
+  output$table <- renderTable(statistics)
+  
   observe({
     temp <- paste("SELECT * FROM facts WHERE year = ", input$year, " AND statistics_id = ", 
                   statistics[statistics$statistics_variable == input$stat, 1])
