@@ -41,10 +41,10 @@ function(input, output, session) {
                   color = "white",
                   fillColor = ~pal(log10(map_fact$value)),
                   highlightOptions = highlightOptions(color = "red", 
-                                                      weight = 3,
+                                                      weight = 4,
                                                       bringToFront = TRUE), 
                   label = paste(locations$neighbourhood_name, " - ", map_fact$value)) %>%
-      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9)
+      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = statistics[1,3])
   })
   
   observe({
@@ -76,10 +76,10 @@ function(input, output, session) {
                   color = "white",
                   fillColor = ~pal(map_fact$value),
                   highlightOptions = highlightOptions(color = "red", 
-                                                      weight = 3,
+                                                      weight = 4,
                                                       bringToFront = TRUE), 
                   label = paste(map_fact$neighbourhood_name, " - ", map_fact$value)) %>%
-      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9)
+      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = input$stat)
   })
   
   observeEvent(input$Map_shape_click, { # update the location selectInput on map clicks
