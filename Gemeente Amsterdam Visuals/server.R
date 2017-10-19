@@ -1,10 +1,15 @@
-
+# install.packages("ggplot2")
+# install.packages("leaflet")
+# install.packages("dplyr")
+# install.packages("RMySQL")
+# install.packages("geojsonio")
 
 function(input, output, session) {
   library(ggplot2)
   library(leaflet)
   library(dplyr)
   library(RMySQL)
+  library(geojsonio)
   
   if(!is.null(map_fact)) {
     # Data transfer to SQL datawarehouse 
@@ -33,7 +38,8 @@ function(input, output, session) {
     pal <- colorNumeric("viridis", NULL)
     
     leaflet(data = buurten_map) %>%
-      addTiles() %>%
+      addTiles(group = "OSM",
+               options = providerTileOptions(minZoom = 12, maxZoom = 14)) %>%
       addPolygons(stroke = TRUE, 
                   weight = 2, 
                   smoothFactor = 1, 
@@ -66,9 +72,7 @@ function(input, output, session) {
     
     leafletProxy("map", data = buurten_map) %>%
       clearShapes() %>%
-      clearTiles() %>%
       clearControls() %>%
-      addTiles() %>%
       addPolygons(stroke = TRUE, 
                   weight = 2, 
                   smoothFactor = 1, 
@@ -82,13 +86,19 @@ function(input, output, session) {
       addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = input$stat)
   })
   
+  output$dynamicsidebar <- renderMenu({
+    sidebarMenu(
+      
+    )
+  })
+  
   observeEvent(input$Map_shape_click, { # update the location selectInput on map clicks
     p <- input$Map_shape_click
     if(is.null(click))
       return()
     text<-paste("Lattitude ", click$lat, "Longtitude ", click$lng)
     text2<-paste("You've selected point ", click$id)
-    leafletProxy("popup") %>%
+    leafletProxy("map") %>%
       clearPopups() %>%
       addPopups( p$lat, p$lng, "text")
   })
