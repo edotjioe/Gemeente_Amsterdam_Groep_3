@@ -30,7 +30,9 @@ ui <- dashboardPage( skin = "red",
     
             absolutePanel(id = "control", top = 700, right = 50,
                           selectInput("stat", "Select statistic", statistics[, 3]),
-                          sliderInput("year", "Select year", 2005, 2017, 2017, step = 1)
+                          sliderInput("year", "Select year", 2005, 2017, 2017, step = 1),
+            absolutePanel(id = "map_graph_panel", bottom = "20", left = "20",
+                          plotOutput("map_graph"))
             ),
           tags$style(type='text/css', ".selectize-dropdown-content {max-height: 150px; }")
          )

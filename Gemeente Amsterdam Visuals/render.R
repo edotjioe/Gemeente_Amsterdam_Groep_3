@@ -16,7 +16,8 @@ render_map <- function() {
           weight = 4,
           bringToFront = TRUE
         ),
-        label = paste(locations$neighbourhood_name, " - ", map_fact$value)
+        label = paste(locations$neighbourhood_name, " - ", map_fact$value),
+        layerId = ~Buurt_code
       ) %>%
       addLegend(
         pal = pal,
@@ -47,21 +48,22 @@ update_map <- function(year, stat) {
                 highlightOptions = highlightOptions(color = "red", 
                                                     weight = 4,
                                                     bringToFront = TRUE), 
-                label = paste(map_fact$neighbourhood_name, " - ", map_fact$value)) %>%
+                label = paste(map_fact$neighbourhood_name, " - ", map_fact$value),
+                layerId = ~Buurt_code) %>%
     addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
   
   return(map)
 }
 
 # Display graph based on selected area on map
-show_map_graph <- function(mouse) {
+render_map_graph <- function(mouse, stat) {
   if(is.null(mouse))
     return()
-  text<-paste("Lattitude ", mouse$lat, "Longtitude ", mouse$lng)
-  text2<-paste("You've selected point ", mouse$id)
-  map <- leafletProxy("map") %>%
-    clearPopups() %>%
-    addPopups(mouse$lng, mouse$lat, text)
   
-  return(map)
+  fact <- get_query(paste0("SELECT * FROM facts WHERE location_id = ", locations["neighbourhood_code" == mouse$id, "locations_id"], " AND statistics_id = ", stat))
+
+  plot <- ggplot(fact, aes(x = ~year, y = ~value)) + 
+    geom_point()
+  
+  return(renderPlot(plot))
 }
