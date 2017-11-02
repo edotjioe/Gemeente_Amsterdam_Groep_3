@@ -1,5 +1,7 @@
 library(shinydashboard)
 
+source("init.R")
+
 ui <- dashboardPage( skin = "red",
   dashboardHeader(title = "Amsterdam Statistieken", titleWidth = 300),
   dashboardSidebar( width = 300,
