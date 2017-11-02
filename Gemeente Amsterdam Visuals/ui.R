@@ -1,6 +1,7 @@
-library(shinydashboard)
-
+# Load all source files here!
+source("mysql.R")
 source("init.R")
+source("render.R")
 
 ui <- dashboardPage( skin = "red",
   dashboardHeader(title = "Amsterdam Statistieken", titleWidth = 300),

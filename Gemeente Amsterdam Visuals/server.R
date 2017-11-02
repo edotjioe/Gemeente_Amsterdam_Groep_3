@@ -1,37 +1,6 @@
-# install.packages("ggplot2")
-# install.packages("leaflet")
-# install.packages("dplyr")
-# install.packages("RMySQL")
-# install.packages("geojsonio")
-
-function(input, output, session) {
-  library(ggplot2)
-  library(leaflet)
-  library(dplyr)
-  library(RMySQL)
-  library(geojsonio)
-  
-  if(!is.null(map_fact)) {
-    # Data transfer to SQL datawarehouse 
-  }
-  
+server <- function(input, output, session) {
   # Combine the selected variables into a new data frame
-  output$map <- renderLeaflet({
-    leaflet(data = neightbourhood_map) %>%
-      addTiles(group = "OSM",
-               options = providerTileOptions(minZoom = 12, maxZoom = 14)) %>%
-      addPolygons(stroke = TRUE, 
-                  weight = 2, 
-                  smoothFactor = 1, 
-                  fillOpacity = 0.7, 
-                  color = "white",
-                  fillColor = ~pal(log10(map_fact$value)),
-                  highlightOptions = highlightOptions(color = "red", 
-                                                      weight = 4,
-                                                      bringToFront = TRUE), 
-                  label = paste(locations$neighbourhood_name, " - ", map_fact$value)) %>%
-      addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = statistics[1,3])
-  })
+  output$map <- render_map()
   
   observe({
     temp <- paste("SELECT * FROM facts WHERE year = ", input$year, " AND statistics_id = ", 
