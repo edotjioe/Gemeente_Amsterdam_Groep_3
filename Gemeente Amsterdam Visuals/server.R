@@ -4,6 +4,8 @@
 # install.packages("RMySQL")
 # install.packages("geojsonio")
 
+source("table.R")
+
 function(input, output, session) {
   library(ggplot2)
   library(leaflet)
@@ -52,9 +54,6 @@ function(input, output, session) {
                   label = paste(locations$neighbourhood_name, " - ", map_fact$value)) %>%
       addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = statistics[1,3])
   })
-  
-  # Table
-  output$table <- renderTable(statistics)
   
   observe({
     temp <- paste("SELECT * FROM facts WHERE year = ", input$year, " AND statistics_id = ", 
@@ -106,4 +105,11 @@ function(input, output, session) {
       addPopups( p$lat, p$lng, "text")
   })
   
+  # Table
+  output$table <- get_table(map_fact)
+  
+  output$table_plot <- renderPlot({
+    plot(input$table_rows_selected)
+  })
+    
 }

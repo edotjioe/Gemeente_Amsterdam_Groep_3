@@ -37,9 +37,14 @@ ui <- dashboardPage( skin = "red",
       tabItem( tabName = "subchart2",
                h2("Chart 2")
       ),
-      tabItem( tabName = "datatable",
-               h2("Data explorer"),
-               tableOutput("table")
+      
+      tabItem(
+        tabName = "datatable",
+        fluidPage(
+          h2("Data explorer"),
+          DT::dataTableOutput("table"),
+          plotOutput("table_plot", height = 500)
+        )      
       )
     )
     
