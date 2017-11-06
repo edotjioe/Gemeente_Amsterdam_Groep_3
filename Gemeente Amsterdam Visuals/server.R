@@ -4,9 +4,9 @@ server <- function(input, output, session) {
 
   output$dynamicsidebar <- renderMenu(sidebarMenu())
 
-  # observeEvent(input$map_shape_click, {
-  #   output$map_graph <- render_map_graph(input$map_shape_click, input$stat)
-  # })
+  observeEvent(input$map_shape_click, {
+   output$map_graph <- render_map_graph(input$map_shape_click, input$stat)
+  })
   
   observeEvent({
     input$stat

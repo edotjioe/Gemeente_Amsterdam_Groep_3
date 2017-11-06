@@ -60,10 +60,11 @@ render_map_graph <- function(mouse, stat) {
   if(is.null(mouse))
     return()
   
-  fact <- get_query(paste0("SELECT * FROM facts WHERE location_id = ", locations["neighbourhood_code" == mouse$id, "locations_id"], " AND statistics_id = ", stat))
+  query <- paste0("SELECT * FROM facts WHERE locations_id = ", locations[locations$neighbourhood_code == mouse$id,]$locations_id, " AND statistics_id = ", statistics[statistics$statistics_variable == stat,]$statistics_id)
+  fact <- get_query(query)
 
-  plot <- ggplot(fact, aes(x = ~year, y = ~value)) + 
-    geom_point()
-  
+  plot <- ggplot() +
+    geom_line(data = fact, aes(x = year, y = value))
+
   return(renderPlot(plot))
 }
