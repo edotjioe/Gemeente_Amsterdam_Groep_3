@@ -16,7 +16,8 @@ render_map <- function() {
           weight = 4,
           bringToFront = TRUE
         ),
-        label = paste(locations$neighbourhood_name, " - ", map_fact$value)
+        label = paste(locations$neighbourhood_name, " - ", map_fact$value),
+        layerId = ~ Buurt_code
       ) %>%
       addLegend(
         pal = pal,
@@ -29,26 +30,40 @@ render_map <- function() {
 
 # Update map on a year or stat change
 update_map <- function(year, stat) {
-  query <- paste("SELECT * FROM facts WHERE year = ", year, " AND statistics_id = ", 
-                statistics[statistics$statistics_variable == stat, 1])
+  query <-
+    paste("SELECT * FROM facts WHERE year = ",
+          year,
+          " AND statistics_id = ",
+          statistics[statistics$statistics_variable == stat, 1])
   stats <- get_query(query)
   
-  map_fact <- data.frame(locations, value = stats[match(locations$locations_id, stats$locations_id), "value"])
+  map_fact <-
+    data.frame(locations, value = stats[match(locations$locations_id, stats$locations_id), "value"])
   
   map <- leafletProxy("map", data = neightbourhood_map) %>%
     clearShapes() %>%
     clearControls() %>%
-    addPolygons(stroke = TRUE, 
-                weight = 2, 
-                smoothFactor = 1, 
-                fillOpacity = 0.7, 
-                color = "white",
-                fillColor = ~pal(map_fact$value),
-                highlightOptions = highlightOptions(color = "red", 
-                                                    weight = 4,
-                                                    bringToFront = TRUE), 
-                label = paste(map_fact$neighbourhood_name, " - ", map_fact$value)) %>%
-    addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
+    addPolygons(
+      stroke = TRUE,
+      weight = 2,
+      smoothFactor = 1,
+      fillOpacity = 0.7,
+      color = "white",
+      fillColor = ~ pal(map_fact$value),
+      highlightOptions = highlightOptions(
+        color = "red",
+        weight = 4,
+        bringToFront = TRUE
+      ),
+      label = paste(map_fact$neighbourhood_name, " - ", map_fact$value),
+      layerId = ~ Buurt_code
+    ) %>%
+    addLegend(
+      pal = pal,
+      values = ~ map_fact$value,
+      opacity = 0.9,
+      title = stat
+    )
   
   return(map)
 }
@@ -60,15 +75,21 @@ get_table <- function(df) {
 }
 
 # Display graph based on selected area on map
-show_map_graph <- function(mouse) {
-  if(is.null(mouse))
+render_map_graph <- function(mouse, stat) {
+  if (is.null(mouse))
     return()
-  text<-paste("Lattitude ", mouse$lat, "Longtitude ", mouse$lng)
-  text2<-paste("You've selected point ", mouse$id)
-  map <- leafletProxy("map") %>%
-    clearPopups() %>%
-    addPopups(mouse$lng, mouse$lat, text)
   
-  return(map)
+  query <-
+    paste0(
+      "SELECT * FROM facts WHERE locations_id = ",
+      locations[locations$neighbourhood_code == mouse$id, ]$locations_id,
+      " AND statistics_id = ",
+      statistics[statistics$statistics_variable == stat, ]$statistics_id
+    )
+  fact <- get_query(query)
+  
+  plot <- ggplot() +
+    geom_line(data = fact, aes(x = year, y = value))
+  
+  return(renderPlot(plot))
 }
-

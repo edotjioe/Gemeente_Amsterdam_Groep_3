@@ -1,4 +1,3 @@
-library(shinydashboard)
 # Load all source files here!
 source("mysql.R")
 source("init.R")
@@ -37,10 +36,19 @@ ui <- dashboardPage(
             h2("Dashboard")),
     tabItem(
       tabName = "map",
+      
       fluidRow(
         tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
         leafletOutput("map", width = "100%"),
         
+        absolutePanel(
+          id = "map_graph_panel",
+          bottom = "20",
+          left = "320",
+          width = 500,
+          height = 400,
+          plotOutput("map_graph")
+        ),
         absolutePanel(
           id = "control",
           top = 700,
@@ -56,10 +64,16 @@ ui <- dashboardPage(
     tabItem(tabName = "subchart2",
             h2("Chart 2")),
     tabItem(tabName = "datatable",
+            h2("Data Explorer"),
             fluidPage(
-              h2("Data explorer"),
-              DT::dataTableOutput("table"),
-              plotOutput("table_plot", height = 500)
+              tabBox(
+                width = 9,
+                title = "",
+                tabPanel("Genre's",
+                         DT::dataTableOutput("datatable1")),
+                tabPanel("Movies",
+                         DT::dataTableOutput("datatable2"))
+              )
             ))
   ))
 )

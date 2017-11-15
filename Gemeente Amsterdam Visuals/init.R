@@ -1,4 +1,4 @@
-# Install all libraries here!
+# install all libraries here!
 # install.packages("shiny")
 # install.packages("shinydashboard")
 # install.packages("ggplot2")
@@ -39,7 +39,7 @@ load_map_locations <- function() {
   
   temp <- load_map_neightbourhood()
   locations <- locations %>% slice(match(temp$Buurt_code, locations$neighbourhood_code))
-
+  
   return(locations)
 }
 
