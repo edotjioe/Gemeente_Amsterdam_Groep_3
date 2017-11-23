@@ -23,7 +23,7 @@ render_map <- function() {
         pal = pal,
         values = ~ map_fact$value,
         opacity = 0.9,
-        title = statistics[1, 3]
+        title = statistics[1, "statistics_variable"]
       )
   }))
 }
@@ -31,7 +31,7 @@ render_map <- function() {
 # Update map on a year or stat change
 update_map <- function(year, stat) {
   query <- paste("SELECT * FROM facts WHERE year = ", year, " AND statistics_id = ", 
-                statistics[statistics$statistics_variable == stat, 1])
+                statistics[statistics$statistics_variable == stat, "statistics_id"])
   stats <- get_query(query)
   
   map_fact <- data.frame(locations, value = stats[match(locations$locations_id, stats$locations_id), "value"])
@@ -51,8 +51,6 @@ update_map <- function(year, stat) {
                 label = paste(map_fact$neighbourhood_name, " - ", map_fact$value),
                 layerId = ~Buurt_code) %>%
     addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
-  
-  return(map)
 }
 
 # Display graph based on selected area on map
@@ -67,4 +65,9 @@ render_map_graph <- function(mouse, stat) {
     geom_line(data = fact, aes(x = year, y = value))
 
   return(renderPlot(plot))
+}
+
+# Render the stat dropdown based on the selected theme
+update_stat_select <- function(session, theme) {
+  return(updateSelectInput(session, "stat", choices = split(statistics[statistics$theme_name == theme,]$statistics_variable, statistics[statistics$theme_name == theme,]$statistics_name)))
 }

@@ -24,9 +24,14 @@ ui <- dashboardPage(
         condition = "input.sidebar == 'map'",
         class = "filter-panel",
         selectInput(
+          "theme",
+          "Select theme",
+          unique(statistics$theme_name)
+        ),
+        selectInput(
           "stat",
           "Select statistic",
-          split(statistics$statistics_variable, statistics$statistics_name)
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1)
       ),
