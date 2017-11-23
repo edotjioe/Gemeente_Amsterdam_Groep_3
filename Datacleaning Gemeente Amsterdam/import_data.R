@@ -29,7 +29,9 @@ facts <- facts[grep('[A-Z][0-9]{2}[a-z]', facts$gebiedcode15),]
 # Loading data in statistics 
 statistics <- data.frame("theme_name" = bbga_metadata$THEMA,
                          "statistics_variable" = toupper(bbga_metadata$Variabele),
-                         "statistics_unit" = bbga_metadata$Rekeneenheid, stringsAsFactors = FALSE)
+                         "statistics_unit" = bbga_metadata$Rekeneenheid,
+                         "statistics_name" = bbga_metadata$Label,
+                         "statistics_definition" = bbga_metadata$Definitie, stringsAsFactors = FALSE)
 
 # Loading data in locations
 locations <- data.frame("district_code", 
