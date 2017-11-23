@@ -60,11 +60,17 @@ render_map_graph <- function(mouse, stat) {
   
   query <- paste0("SELECT * FROM facts WHERE locations_id = ", locations[locations$neighbourhood_code == mouse$id,]$locations_id, " AND statistics_id = ", statistics[statistics$statistics_variable == stat,]$statistics_id)
   fact <- get_query(query)
+  
+  if(nrow(fact))
+    show("map_graph")
+  else
+    hide("map_graph")
+  
+  plot <- plot_ly(data = fact, x = ~year, y = ~value, type = "bar") %>%
+    layout(xaxis = list(range = c(min(fact$year) - 0.5, min(fact$year), max(fact$year), max(fact$year) + 0.5), dtick = 1)) %>%
+    config(displayModeBar = FALSE)
 
-  plot <- ggplot() +
-    geom_line(data = fact, aes(x = year, y = value))
-
-  return(renderPlot(plot))
+  return(renderPlotly(plot))
 }
 
 # Render the stat dropdown based on the selected theme

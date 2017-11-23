@@ -48,6 +48,7 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    useShinyjs(),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "theme.css")
     ),
@@ -67,7 +68,7 @@ ui <- dashboardPage(
             left = "320",
             width = 500,
             height = 400,
-            plotOutput("map_graph")
+            plotlyOutput("map_graph")
           ),
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
