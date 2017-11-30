@@ -1,5 +1,7 @@
-# Render intial map
+# Render initial map
 render_map <- function() {
+  print("Render initial map")
+  
   return(renderLeaflet({
     leaflet(data = neightbourhood_map) %>%
       addTiles(group = "OSM",
@@ -30,6 +32,8 @@ render_map <- function() {
 
 # Update map on a year or stat change
 update_map <- function(year, stat) {
+  print("Updating map on year or stat")
+  
   query <- paste("SELECT * FROM facts WHERE year = ", year, " AND statistics_id = ", 
                 statistics[statistics$statistics_variable == stat, "statistics_id"])
   stats <- get_query(query)
@@ -51,6 +55,50 @@ update_map <- function(year, stat) {
                 label = paste(map_fact$neighbourhood_name, " - ", map_fact$value),
                 layerId = ~Buurt_code) %>%
     addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
+}
+
+# Display graph based on selected area on map
+render_map_graph <- function(mouse, stat, year) {
+  print("Display graph based on selected area on map")
+  
+  if(is.null(mouse))
+    return()
+  
+  query <- paste0("SELECT * FROM facts WHERE locations_id = ", locations[locations$neighbourhood_code == mouse$id,]$locations_id, " AND statistics_id = ", statistics[statistics$statistics_variable == stat,]$statistics_id)
+  fact <- get_query(query)
+  
+  if(nrow(fact))
+    show("map_graph")
+  else
+    hide("map_graph")
+  
+  plot <- plot_ly(data = fact, x = ~year, y = ~value, type = "bar") %>%
+    layout(xaxis = list(range = c(min(fact$year) - 0.5, min(fact$year), max(fact$year), max(fact$year) + 0.5), dtick = 1)) %>%
+    config(displayModeBar = FALSE) %>% 
+    layout(plot_bgcolor='transparent') %>% 
+    layout(paper_bgcolor='transparent')
+  
+  leaflet_map_index <- as.numeric(match(mouse$id, locations$neighbourhood_code))
+  
+  location_poly <- map_fact[leaflet_map_index,]
+  
+  map <- leafletProxy("map") %>%
+    removeShape(layerId = mouse$id) %>%
+    addPolygons(layerId = mouse$id, 
+                fillColor = "blue", 
+                data = neightbourhood_map[leaflet_map_index,],
+                stroke = TRUE, 
+                weight = 2, 
+                smoothFactor = 1, 
+                fillOpacity = 0.7, 
+                color = "white",
+                highlightOptions = highlightOptions(color = "red", 
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(location_poly$neighbourhood_name, " - ", location_poly$value)
+                )
+  
+  return(renderPlotly(plot))
 }
 
 # Render the stat dropdown based on the selected theme
