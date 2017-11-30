@@ -15,6 +15,7 @@ library(leaflet)
 library(dplyr)
 library(RMySQL)
 library(geojsonio)
+library(plotly)
 
 load_map_neightbourhood <- function() {
   return(geojsonio::geojson_read("datafiles/GEBIED_BUURTEN.json", what = "sp", stringsAsFactor = FALSE))

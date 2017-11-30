@@ -90,17 +90,18 @@ ui <- dashboardPage(
                 fluidRow(
                   column(width = 5,
                          selectInput("stadsdeel1", "Kies een stadsdeel:", width = 150,
-                                     split(unique(locations$district_code),unique(locations$district_name))),
+                                     unique(locations$district_name)),
                          selectInput("stadsdeel2", "Kies een stadsdeel:", width = 150,
-                                     split(unique(locations$district_code),unique(locations$district_name)))
+                                     unique(locations$district_name))
                   ),
                   column(width = 5,
                          selectInput("thema", "Kies een thema:", width = 150,
-                                     statistics[which(grepl("BEV",statistics$statistics_variable)),]$statistics_variable),
-                         actionButton("vergelijk", "Vergelijk!", style = 'margin-top:3.3vh ; background-color:#fff', width =  150)
+                                     statistics[which(grepl("BEV",statistics$statistics_variable)),]$statistics_variable)
+                         #actionButton("vergelijk", "Vergelijk!", style = 'margin-top:3.3vh ; background-color:#fff', width =  150)
                   )
                 )
-              )
+              ),
+              plotlyOutput("stadsdeelchart")
       )
     )
     
