@@ -1,0 +1,7 @@
+.filter-panel {
+  background-color: rgb(44, 59, 65);
+}
+
+.filter-panel > div {
+  margin-bottom: 0;
+}
