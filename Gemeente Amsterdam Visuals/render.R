@@ -1,7 +1,5 @@
 # Render initial map
 render_map <- function() {
-  print("Render initial map")
-  
   return(renderLeaflet({
     leaflet(data = neightbourhood_map) %>%
       addTiles(group = "OSM",
@@ -32,8 +30,6 @@ render_map <- function() {
 
 # Update map on a year or stat change
 update_map <- function(year, stat) {
-  print("Updating map on year or stat")
-  
   query <- paste("SELECT * FROM facts WHERE year = ", year, " AND statistics_id = ", 
                 statistics[statistics$statistics_variable == stat, "statistics_id"])
   stats <- get_query(query)
@@ -66,11 +62,8 @@ render_map_graph <- function(id) {
   if(id %in% selected_locations) {
     color <- "blue"
   } else {
-    color <- pal(map_fact$value[])
-    color <- color[leaflet_map_index]
+    color <- ~pal(map_fact$value)[leaflet_map_index]
   }
-  
-  ?print(pal = colorNumeric("viridis", map_fact$value), map_fact$value[])
   
   leafletProxy("map") %>%
     removeShape(layerId = id) %>%
