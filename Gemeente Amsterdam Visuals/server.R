@@ -15,11 +15,8 @@ server <- function(input, output, session) {
   observeEvent({
     input$theme
   }, update_stat_select(session, input$theme))
-  
-<<<<<<< HEAD
+
   observeEvent({
     input$map_shape_click
   }, add_to_map_selection(input$map_shape_click))
-=======
->>>>>>> 8ebbef079117bb45b40a7fecc550bb375c661061
 }
