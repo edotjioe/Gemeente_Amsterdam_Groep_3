@@ -51,9 +51,15 @@ load_color_scheme <- function() {
   return(colorNumeric("viridis", NULL))
 }
 
+create_various_variables <- function() {
+  return(as.numeric(leaflet_map_index <- 1))
+}
+
 # Create environment variables
+print("Running init.R")
 locations <- load_map_locations()
 statistics <- load_map_statistics()
 map_fact <- load_map_facts()
 neightbourhood_map <- load_map_neightbourhood()
 pal <- load_color_scheme()
+leaflet_map_index <- create_various_variables()
