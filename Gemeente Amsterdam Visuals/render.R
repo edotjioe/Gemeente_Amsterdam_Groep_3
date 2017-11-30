@@ -64,11 +64,13 @@ render_map_graph <- function(id) {
   location_poly <- map_fact[leaflet_map_index,]
   
   if(id %in% selected_locations) {
-    color = "blue"
+    color <- "blue"
   } else {
-    color = ~pal(map_fact$value["neighbourhood_code" == id])
-    print(color)
+    color <- pal(map_fact$value[])
+    color <- color[leaflet_map_index]
   }
+  
+  ?print(pal = colorNumeric("viridis", map_fact$value), map_fact$value[])
   
   leafletProxy("map") %>%
     removeShape(layerId = id) %>%
