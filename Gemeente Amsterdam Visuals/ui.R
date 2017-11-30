@@ -30,15 +30,14 @@ ui <- dashboardPage(
         ),
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1)
       ),
-      menuItem("Charts", tabName = "chart", icon = icon("bar-chart-o"),
-               menuSubItem("Chart 1", tabName = "subchart1"),
-               menuSubItem("Chart 2", tabName = "subchart2"),
-               menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel"),
-               menuSubItem("Chart 2", tabName = "subchart2")
+      menuItem(
+        "Charts",
+        tabName = "chart",
+        icon = icon("bar-chart-o"),
+        menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel")
       ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
-      conditionalPanel(condition = "input.sidebar == 'chart'", h2("Test")),
-      conditionalPanel(condition = "input.sidebar == 'datatable'", h3("Test"))
+      sidebarMenuOutput("dynamicsidebar")
     )
   ),
   dashboardBody(
@@ -66,44 +65,58 @@ ui <- dashboardPage(
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
       ),
-      tabItem( tabName = "subchart1",
-               h2("Chart 1"),
-               selectInput("variable", "Kies een bevolkingsgroep:",
-                           statistics[which(grepl("BEV",statistics$statistics_variable)),]$statistics_variable),
-               
-               
-               plotlyOutput("barchart")
+      tabItem(
+        tabName = "subchart1",
+        h2("Chart 1"),
+        selectInput(
+          "variable",
+          "Kies een bevolkingsgroep:",
+          statistics[which(grepl("BEV", statistics$statistics_variable)), ]$statistics_variable
+        ),
+        
+        
+        plotlyOutput("barchart")
       ),
-      tabItem( tabName = "subchart2",
-               h2("Chart 2")
-               
-      ),
-      tabItem( tabName = "datatable",
-               h2("Data explorer"),
-               tableOutput("table")
-      ),
-      tabItem(tabName = "stadsdeel",
-              
-              h2("Vergelijk stadsdelen op leefbaarheid:"), 
-              
-              wellPanel(
-                fluidRow(
-                  column(width = 5,
-                         selectInput("stadsdeel1", "Kies een stadsdeel:", width = 150,
-                                     unique(locations$district_name)),
-                         selectInput("stadsdeel2", "Kies een stadsdeel:", width = 150,
-                                     unique(locations$district_name))
-                  ),
-                  column(width = 5,
-                         selectInput("thema", "Kies een thema:", width = 150,
-                                     statistics[which(grepl("BEV",statistics$statistics_variable)),]$statistics_variable)
-                         #actionButton("vergelijk", "Vergelijk!", style = 'margin-top:3.3vh ; background-color:#fff', width =  150)
-                  )
-                )
+      tabItem(tabName = "subchart2",
+              h2("Chart 2")),
+      tabItem(tabName = "datatable",
+              h2("Data Explorer"),
+              DT::dataTableOutput("datatable1")
               ),
-              plotlyOutput("stadsdeelchart")
+      tabItem(
+        tabName = "stadsdeel",
+        
+        h2("Vergelijk stadsdelen op leefbaarheid:"),
+        
+        wellPanel(fluidRow(
+          column(
+            width = 5,
+            selectInput(
+              "stadsdeel1",
+              "Kies een stadsdeel:",
+              width = 150,
+              unique(locations$district_name)
+            ),
+            selectInput(
+              "stadsdeel2",
+              "Kies een stadsdeel:",
+              width = 150,
+              unique(locations$district_name)
+            )
+          ),
+          column(
+            width = 5,
+            selectInput(
+              "thema",
+              "Kies een thema:",
+              width = 150,
+              statistics[which(grepl("BEV", statistics$statistics_variable)), ]$statistics_variable
+            )
+            #actionButton("vergelijk", "Vergelijk!", style = 'margin-top:3.3vh ; background-color:#fff', width =  150)
+          )
+        )),
+        plotlyOutput("stadsdeelchart")
       )
     )
-    
   )
 )

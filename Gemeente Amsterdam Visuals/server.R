@@ -2,8 +2,10 @@ server <- function(input, output, session) {
   # Combine the selected variables into a new data frame
   output$map <- render_map()
   
+  output$dynamicsidebar <- renderMenu(sidebarMenu())
+  
   observeEvent(input$map_shape_click, {
-   output$map_graph <- render_map_graph(input$map_shape_click, input$stat)
+    output$map_graph <- render_map_graph(input$map_shape_click, input$stat)
   })
 
   observeEvent({
@@ -36,10 +38,7 @@ server <- function(input, output, session) {
     
     plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = input$stadsdeel1, type = 'scatter', mode = 'lines') %>%
       add_trace(y = final$stad2.value, name = input$stadsdeel2, mode = 'lines')
-   
-     
-  
   })  
-  
-  
+  # Table
+  output$datatable1 <- get_table(map_fact)
 }
