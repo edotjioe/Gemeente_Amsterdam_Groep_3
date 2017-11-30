@@ -57,3 +57,7 @@ update_map <- function(year, stat) {
 update_stat_select <- function(session, theme) {
   return(updateSelectInput(session, "stat", choices = split(statistics[statistics$theme_name == theme,]$statistics_variable, statistics[statistics$theme_name == theme,]$statistics_name)))
 }
+
+add_to_map_selection <- function(click) {
+  print(click$id)
+}
