@@ -61,15 +61,7 @@ ui <- dashboardPage(
         fluidRow(
           tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
           leafletOutput("map", width = "100%"),
-          
-          absolutePanel(
-            id = "map_graph_panel",
-            bottom = "20",
-            left = "320",
-            width = 500,
-            height = 400,
-            plotlyOutput("map_graph")
-          ),
+
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
       ),

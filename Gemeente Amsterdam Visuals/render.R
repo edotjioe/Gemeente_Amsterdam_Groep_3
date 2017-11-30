@@ -53,26 +53,6 @@ update_map <- function(year, stat) {
     addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
 }
 
-# Display graph based on selected area on map
-render_map_graph <- function(mouse, stat) {
-  if(is.null(mouse))
-    return()
-  
-  query <- paste0("SELECT * FROM facts WHERE locations_id = ", locations[locations$neighbourhood_code == mouse$id,]$locations_id, " AND statistics_id = ", statistics[statistics$statistics_variable == stat,]$statistics_id)
-  fact <- get_query(query)
-  
-  if(nrow(fact))
-    show("map_graph")
-  else
-    hide("map_graph")
-  
-  plot <- plot_ly(data = fact, x = ~year, y = ~value, type = "bar") %>%
-    layout(xaxis = list(range = c(min(fact$year) - 0.5, min(fact$year), max(fact$year), max(fact$year) + 0.5), dtick = 1)) %>%
-    config(displayModeBar = FALSE)
-
-  return(renderPlotly(plot))
-}
-
 # Render the stat dropdown based on the selected theme
 update_stat_select <- function(session, theme) {
   return(updateSelectInput(session, "stat", choices = split(statistics[statistics$theme_name == theme,]$statistics_variable, statistics[statistics$theme_name == theme,]$statistics_name)))
