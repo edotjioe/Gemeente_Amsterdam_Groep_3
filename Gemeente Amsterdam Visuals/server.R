@@ -3,7 +3,7 @@ server <- function(input, output, session) {
   output$map <- render_map()
   
   observeEvent(input$map_shape_click, {
-    output$map_graph <- render_map_graph(input$map_shape_click, input$stat, input$year)
+    add_to_map_selection(input$map_shape_click)
   })
 
   observeEvent({
@@ -15,8 +15,4 @@ server <- function(input, output, session) {
   observeEvent({
     input$theme
   }, update_stat_select(session, input$theme))
-
-  observeEvent({
-    input$map_shape_click
-  }, add_to_map_selection(input$map_shape_click))
 }
