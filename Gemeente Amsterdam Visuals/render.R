@@ -1,5 +1,5 @@
 # Render initial map
-render_map <- function() {
+render_map <- function(stat) {
   return(renderLeaflet({
     leaflet(data = neightbourhood_map) %>%
       addTiles(group = "OSM",
@@ -23,7 +23,7 @@ render_map <- function() {
         pal = pal,
         values = ~ map_fact$value,
         opacity = 0.9,
-        title = statistics[1, "statistics_variable"]
+        title = statistics[42, "statistics_name"]
       )
   }))
 }
@@ -50,7 +50,7 @@ update_map <- function(year, stat) {
                                                     bringToFront = TRUE), 
                 label = paste(map_fact$neighbourhood_name, " - ", map_fact$value),
                 layerId = ~Buurt_code) %>%
-    addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = stat)
+    addLegend(pal = pal, values = ~map_fact$value, opacity = 0.9, title = statistics[which(statistics$statistics_variable == stat), "statistics_name"])
 }
 
 # Display graph based on selected area on map
