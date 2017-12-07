@@ -88,6 +88,10 @@ update_stat_select <- function(session, theme) {
 }
 
 add_to_map_selection <- function(click) {
+  if(is.na(map_fact[map_fact$neighbourhood_code == click$id, "value"])) {
+    return()
+  }
+  
   if(click$id %in% selected_locations) {
     assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
   } else {
