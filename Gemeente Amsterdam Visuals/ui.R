@@ -24,9 +24,14 @@ ui <- dashboardPage(
         condition = "input.sidebar == 'map'",
         class = "filter-panel",
         selectInput(
+          "theme",
+          "Select theme",
+          unique(statistics$theme_name)
+        ),
+        selectInput(
           "stat",
           "Select statistic",
-          split(statistics$statistics_variable, statistics$statistics_name)
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
       ),
@@ -61,6 +66,7 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    useShinyjs(),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "theme.css")
     ),
@@ -73,15 +79,7 @@ ui <- dashboardPage(
         fluidRow(
           tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;}"),
           leafletOutput("map", width = "100%"),
-          
-          absolutePanel(
-            id = "map_graph_panel",
-            bottom = "20",
-            left = "320",
-            width = 500,
-            height = 400,
-            plotOutput("map_graph")
-          ),
+
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
       ),

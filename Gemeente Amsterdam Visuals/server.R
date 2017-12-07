@@ -3,15 +3,19 @@ server <- function(input, output, session) {
   output$map <- render_map()
   
   output$dynamicsidebar <- renderMenu(sidebarMenu())
-  
-  observeEvent(input$map_shape_click, {
-    output$map_graph <- render_map_graph(input$map_shape_click, input$stat)
-  })
+
+  observeEvent({
+    input$map_shape_click
+    }, add_to_map_selection(input$map_shape_click))
 
   observeEvent({
     input$stat
     input$year
   }, update_map(input$year, input$stat))
+  
+  observeEvent({
+    input$theme
+  }, update_stat_select(session, input$theme))
   
   observeEvent({
     input$thema
