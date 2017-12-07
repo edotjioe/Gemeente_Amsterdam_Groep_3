@@ -28,13 +28,33 @@ ui <- dashboardPage(
           "Select statistic",
           split(statistics$statistics_variable, statistics$statistics_name)
         ),
-        sliderInput("year", "Select year", 2005, 2017, 2017, step = 1)
+        sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
       ),
       menuItem(
         "Charts",
         tabName = "chart",
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel")
+      ),
+      conditionalPanel(
+        condition = "input.sidebar == 'stadsdeel'",
+        class = "filter-panel",
+        selectInput(
+          "thema",
+          "Kies een thema:",
+          split(statistics[which(statistics$statistics_unit == 2), "statistics_variable"], statistics[which(statistics$statistics_unit == 2), "statistics_name"])
+        ),
+        selectInput(
+          "stadsdeel1",
+          "Kies een stadsdeel:",
+          unique(locations$district_name)
+        ),
+        selectInput(
+          "stadsdeel2",
+          "Kies een stadsdeel:",
+          unique(locations$district_name),
+          selected = "Zuid"
+        )
       ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
       sidebarMenuOutput("dynamicsidebar")
@@ -87,34 +107,6 @@ ui <- dashboardPage(
         tabName = "stadsdeel",
         
         h2("Vergelijk stadsdelen op leefbaarheid:"),
-        
-        wellPanel(fluidRow(
-          column(
-            width = 5,
-            selectInput(
-              "stadsdeel1",
-              "Kies een stadsdeel:",
-              width = 150,
-              unique(locations$district_name)
-            ),
-            selectInput(
-              "stadsdeel2",
-              "Kies een stadsdeel:",
-              width = 150,
-              unique(locations$district_name)
-            )
-          ),
-          column(
-            width = 5,
-            selectInput(
-              "thema",
-              "Kies een thema:",
-              width = 150,
-              statistics[which(grepl("BEV", statistics$statistics_variable)), ]$statistics_variable
-            )
-            #actionButton("vergelijk", "Vergelijk!", style = 'margin-top:3.3vh ; background-color:#fff', width =  150)
-          )
-        )),
         plotlyOutput("stadsdeelchart")
       )
     )
