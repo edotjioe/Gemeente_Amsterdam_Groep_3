@@ -33,9 +33,9 @@ update_map <- function(year, stat) {
   query <- paste("SELECT * FROM facts WHERE year = ", year, " AND statistics_id = ", 
                 statistics[statistics$statistics_variable == stat, "statistics_id"])
   stats <- get_query(query)
-  
-  map_fact <- data.frame(locations, value = stats[match(locations$locations_id, stats$locations_id), "value"])
-  
+
+  assign("map_fact", data.frame(locations, value = stats[match(locations$locations_id, stats$locations_id), "value"]), envir = globalenv())
+
   map <- leafletProxy("map", data = neightbourhood_map) %>%
     clearShapes() %>%
     clearControls() %>%
@@ -58,13 +58,13 @@ render_map_graph <- function(id) {
   leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
 
   location_poly <- map_fact[leaflet_map_index,]
-  
+
   if(id %in% selected_locations) {
     color <- "blue"
   } else {
     color <- ~pal(map_fact$value)[leaflet_map_index]
   }
-  
+
   leafletProxy("map") %>%
     removeShape(layerId = id) %>%
     addPolygons(layerId = id,
