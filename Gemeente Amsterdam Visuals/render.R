@@ -89,7 +89,7 @@ update_stat_select <- function(session, theme) {
 
 add_to_map_selection <- function(click) {
   if(click$id %in% selected_locations) {
-    assign("selected_locations", selected_locations[!click$id %in% selected_locations], envir = globalenv())
+    assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
   } else {
     assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
   }
