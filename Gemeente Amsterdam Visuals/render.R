@@ -93,3 +93,43 @@ render_map_graph <- function(mouse, stat) {
   
   return(renderPlot(plot))
 }
+
+render_graph <- function(theme, city_district1, city_district2) {
+  plot <- renderPlotly({
+    # 1 - percentage
+    # 2 - absoluut
+    # 3 - rapportcijfer
+    # 4 - index
+    # 5 - gemiddelde
+    # 6 - per 1000
+    # 7 - 5-puntsschaal
+    # 8 - coefficient
+    
+    statistics_id <- statistics %>%
+      filter(statistics_variable == theme) %>%
+      select(statistics_id)
+    
+    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
+    
+    chart_data <- factscompare %>% 
+      inner_join(locations, by = "locations_id") %>%
+      inner_join(statistics, by = "statistics_id") %>%
+      group_by(year, district_name) %>%
+      summarise(value = sum(value))
+    
+    stad1 <- chart_data %>%
+      filter(district_name == city_district1)
+    stad2 <- chart_data %>%
+      filter(district_name == city_district2)
+    
+    final <- data.frame(unique(chart_data$year), 
+                        stad1$value, 
+                        stad2$value)
+    
+    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
+      add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+      config(displayModeBar = FALSE))
+  })
+  
+  return(plot)
+}
