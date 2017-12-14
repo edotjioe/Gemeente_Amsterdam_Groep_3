@@ -35,9 +35,8 @@ render_map <- function(year, stat) {
 }
 
 colorPicker <- function(neighbourhood_code) {
-  # colors <- data.frame(code = character(0), color = character(0))
-  colors <- rbind(code = neighbourhood_code, color = "grey")
-  # colors[, "color"] = "grey"
+  colors <- data.frame(code = neighbourhood_code)
+  colors$color <- "grey"
   
   colors[which(colors$code == selected_locations), "color"] = "blue"
   
@@ -45,7 +44,6 @@ colorPicker <- function(neighbourhood_code) {
 }
 
 render_select_map <- function(click) {
-  neighbourhood_map <- neighbourhood_map[]
   map <- leaflet(data = neighbourhood_map) %>%
     addTiles(group = "OSM",
              options = providerTileOptions(minZoom = 10, maxZoom = 14)) %>%
@@ -54,12 +52,13 @@ render_select_map <- function(click) {
       weight = 2,
       smoothFactor = 1,
       fillOpacity = 0.7,
-      color = colorPicker(~neighbourhood_map$Buurt_code),
+      color = colorPicker(neighbourhood_map$Buurt_code),
       highlightOptions = highlightOptions(
         color = "red",
         weight = 4,
         bringToFront = TRUE
       ),
+      label = neighbourhood_map$Buurt,
       layerId = ~ Buurt_code
     )
   
@@ -123,35 +122,33 @@ add_to_map_selection <- function(click) {
   } else {
     assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
   }
+  
+  update_seleted_polys(click$id)
 }
 
-# update_seleted_polys <- function(id, year, stat) {
-#   leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
-# 
-#   stat_id <- statistics[which(statistics$statistics_variable == stat)]$statistics_id
-#   map_facts <- facts[which(facts$year == year && facts$statistics_id == stat_id)]
-# 
-#   location_poly <- map_facts[leaflet_map_index,]
-# 
-#   if(id %in% selected_locations) {
-#     color <- "blue"
-#   } else {
-#     color <- ~pal(map_facts$value)[leaflet_map_index]
-#   }
-# 
-#   leafletProxy("map_graph") %>%
-#     removeShape(layerId = id) %>%
-#     addPolygons(layerId = id,
-#                 fillColor = color,
-#                 data = neighbourhood_map[leaflet_map_index,],
-#                 stroke = TRUE,
-#                 weight = 2,
-#                 smoothFactor = 1,
-#                 fillOpacity = 0.7,
-#                 color = "white",
-#                 highlightOptions = highlightOptions(color = "red",
-#                                                     weight = 4,
-#                                                     bringToFront = TRUE),
-#                 label = paste(location_poly$neighbourhood_name, " - ", location_poly$value)
-#                 )
-# }
+update_seleted_polys <- function(id) {
+  leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
+  location_poly <- locations[leaflet_map_index,]
+
+  if(id %in% selected_locations) {
+    color <- "blue"
+  } else {
+    color <- "grey"
+  }
+
+  leafletProxy("mapSelectMulti") %>%
+    removeShape(layerId = id) %>%
+    addPolygons(layerId = id,
+                fillColor = color,
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "white",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = location_poly$neighbourhood_name
+                )
+}

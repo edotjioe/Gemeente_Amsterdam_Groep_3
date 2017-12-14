@@ -3,15 +3,10 @@ server <- function(input, output, session) {
   map <- reactive(render_map(input$year, input$stat))
   output$map <- renderLeaflet(map())
   
-  select_map <- eventReactive( 
-    {
-      input$mapSelectMulti_shape_click
-      TRUE # To trigger this event on page load
-    },
-    render_select_map()
-  )
-  output$mapSelectMulti <- renderLeaflet(select_map())
-
+  output$mapSelectMulti <- renderLeaflet(render_select_map())
+  observeEvent({
+    input$mapSelectMulti_shape_click
+  }, add_to_map_selection(input$mapSelectMulti_shape_click))
 
   observeEvent({
     input$theme
@@ -24,9 +19,4 @@ server <- function(input, output, session) {
   }, output$stadsdeelchart <- render_graph(input$thema, input$stadsdeel1, input$stadsdeel2))
   # Table
   output$datatable1 <- get_table(facts)
-  
-  # Map selection code
-  observeEvent({
-    input$mapSelectMulti_shape_click
-  }, add_to_map_selection(input$mapSelectMulti_shape_click))
 }
