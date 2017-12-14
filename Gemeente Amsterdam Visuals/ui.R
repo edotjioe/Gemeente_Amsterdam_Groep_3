@@ -39,7 +39,8 @@ ui <- dashboardPage(
         "Charts",
         tabName = "chart",
         icon = icon("bar-chart-o"),
-        menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel")
+        menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel"),
+        menuSubItem("Vergelijk buurten", tabName = "vergelijkBuurten")
       ),
       conditionalPanel(
         condition = "input.sidebar == 'stadsdeel'",
@@ -59,6 +60,20 @@ ui <- dashboardPage(
           "Kies een stadsdeel:",
           unique(locations$district_name),
           selected = "Zuid"
+        )
+      ),
+      conditionalPanel(
+        condition = "input.sidebar == 'vergelijkBuurten'",
+        class = "filter-panel",
+        selectInput(
+          "theme",
+          "Select theme",
+          unique(statistics$theme_name)
+        ),
+        selectInput(
+          "stat",
+          "Select statistic",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
@@ -106,6 +121,27 @@ ui <- dashboardPage(
         
         h2("Vergelijk stadsdelen op leefbaarheid:"),
         plotlyOutput("stadsdeelchart")
+      ),
+      tabItem(
+        tabName = "vergelijkBuurten",
+        
+        h2("Vergelijk buurten"),
+        fluidRow(
+          box(
+            id = "mapBox",
+            width = 12,
+            title = "Selecteer de buurten die u wilt vergelijken",
+            
+            leafletOutput("mapMultiSelect", width = "100%")
+          ),
+          box(
+            id = "mapGraphBox",
+            width = 12,
+            
+            plotlyOutput("mapGraph")
+          )
+        )
+        
       )
     )
   )

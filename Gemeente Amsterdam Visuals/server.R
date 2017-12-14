@@ -2,6 +2,8 @@ server <- function(input, output, session) {
   # Combine the selected variables into a new data frame
   output$map <- render_map()
   
+  output$mapGraph <- render_map()
+  
   output$dynamicsidebar <- renderMenu(sidebarMenu())
 
   observeEvent({
