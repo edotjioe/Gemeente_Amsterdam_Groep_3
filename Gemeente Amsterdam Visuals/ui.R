@@ -39,7 +39,8 @@ ui <- dashboardPage(
         "Charts",
         tabName = "chart",
         icon = icon("bar-chart-o"),
-        menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel")
+        menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
+        menuSubItem("Vergelijk buurten", tabName = "chart")
       ),
       conditionalPanel(
         condition = "input.sidebar == 'stadsdeel'",
@@ -59,6 +60,26 @@ ui <- dashboardPage(
           "Kies een stadsdeel:",
           unique(locations$district_name),
           selected = "Zuid"
+        )
+      ),
+      conditionalPanel(
+        condition = "input.sidebar == 'chart'",
+        class = "filter-panel",
+        selectInput(
+          "themaC",
+          "Kies een thema:",
+          split(statistics[which(statistics$statistics_unit == 2), "statistics_variable"], statistics[which(statistics$statistics_unit == 2), "statistics_name"])
+        ),
+        selectInput(
+          "stadsdeel1C",
+          "Kies een buurt:",
+          unique(locations$neighbourhood_name)
+        ),
+        selectInput(
+          "stadsdeel2C",
+          "Kies een buurt:",
+          unique(locations$neighbourhood_name),
+          selected = "Osdorp Zuidoost"
         )
       ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
@@ -83,20 +104,6 @@ ui <- dashboardPage(
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
       ),
-      tabItem(
-        tabName = "subchart1",
-        h2("Chart 1"),
-        selectInput(
-          "variable",
-          "Kies een bevolkingsgroep:",
-          statistics[which(grepl("BEV", statistics$statistics_variable)), ]$statistics_variable
-        ),
-        
-        
-        plotlyOutput("barchart")
-      ),
-      tabItem(tabName = "subchart2",
-              h2("Chart 2")),
       tabItem(tabName = "datatable",
               h2("Data Explorer"),
               DT::dataTableOutput("datatable1")
@@ -106,6 +113,12 @@ ui <- dashboardPage(
         
         h2("Vergelijk stadsdelen op leefbaarheid:"),
         plotlyOutput("stadsdeelchart")
+      ),
+      tabItem(
+        tabName = "chart",
+        
+        h2("Vergelijk buurten op leefbaarheid:"),
+        plotlyOutput("stadsdeelchart2")
       )
     )
   )
