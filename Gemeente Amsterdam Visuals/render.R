@@ -6,7 +6,7 @@ render_map <- function(year, stat) {
   map_facts <- map_facts %>%
     right_join(locations, by = "locations_id")
 
-  map <- leaflet(data = neightbourhood_map) %>%
+  map <- leaflet(data = neighbourhood_map) %>%
     addTiles(group = "OSM",
              options = providerTileOptions(minZoom = 12, maxZoom = 14)) %>%
     addPolygons(
@@ -45,8 +45,8 @@ colorPicker <- function(neighbourhood_code) {
 }
 
 render_select_map <- function(click) {
-  neightbourhood_map <- neightbourhood_map[]
-  map <- leaflet(data = neightbourhood_map) %>%
+  neighbourhood_map <- neighbourhood_map[]
+  map <- leaflet(data = neighbourhood_map) %>%
     addTiles(group = "OSM",
              options = providerTileOptions(minZoom = 10, maxZoom = 14)) %>%
     addPolygons(
@@ -54,7 +54,7 @@ render_select_map <- function(click) {
       weight = 2,
       smoothFactor = 1,
       fillOpacity = 0.7,
-      color = colorPicker(~neightbourhood_map$Buurt_code),
+      color = colorPicker(~neighbourhood_map$Buurt_code),
       highlightOptions = highlightOptions(
         color = "red",
         weight = 4,
@@ -143,7 +143,7 @@ add_to_map_selection <- function(click) {
 #     removeShape(layerId = id) %>%
 #     addPolygons(layerId = id,
 #                 fillColor = color,
-#                 data = neightbourhood_map[leaflet_map_index,],
+#                 data = neighbourhood_map[leaflet_map_index,],
 #                 stroke = TRUE,
 #                 weight = 2,
 #                 smoothFactor = 1,

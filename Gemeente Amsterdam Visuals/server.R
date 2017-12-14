@@ -6,7 +6,7 @@ server <- function(input, output, session) {
   select_map <- eventReactive( 
     {
       input$mapSelectMulti_shape_click
-      TRUE
+      TRUE # To trigger this event on page load
     },
     render_select_map()
   )

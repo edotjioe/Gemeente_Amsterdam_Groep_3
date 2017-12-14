@@ -22,7 +22,7 @@ library(plotly)
 library(shinyjs)
 library(DT)
 
-load_map_neightbourhood <- function() {
+load_map_neighbourhood <- function() {
   return(geojsonio::geojson_read("datafiles/GEBIED_BUURTEN.json", what = "sp", stringsAsFactor = FALSE))
 }
 
@@ -37,7 +37,7 @@ load_statistics <- function() {
 load_locations <- function() {
   locations <- get_query("SELECT * FROM locations")
   
-  temp <- load_map_neightbourhood()
+  temp <- load_map_neighbourhood()
   locations <- locations %>% slice(match(temp$Buurt_code, locations$neighbourhood_code))
   
   return(locations)
@@ -56,7 +56,7 @@ print("Running init.R")
 locations <- load_locations()
 statistics <- load_statistics()
 facts <- load_facts()
-neightbourhood_map <- load_map_neightbourhood()
+neighbourhood_map <- load_map_neighbourhood()
 pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
