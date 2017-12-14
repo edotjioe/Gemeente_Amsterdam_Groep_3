@@ -111,8 +111,15 @@ render_graph <- function(theme, city_district1, city_district2) {
 }
 
 # Render the stat dropdown based on the selected theme
-update_stat_select <- function(session, theme) {
-  return(updateSelectInput(session, "stat", choices = split(statistics[statistics$theme_name == theme,]$statistics_variable, statistics[statistics$theme_name == theme,]$statistics_name)))
+update_stat_select <- function(session, theme, theme_map_select) {
+  updateSelectInput(session,
+                    "stat",
+                    choices = split(statistics[statistics$theme_name == theme,]$statistics_variable,
+                                    statistics[statistics$theme_name == theme,]$statistics_name))
+  updateSelectInput(session,
+                    "stat_map_select",
+                    choices = split(statistics[statistics$theme_name == theme_map_select,]$statistics_variable,
+                                    statistics[statistics$theme_name == theme_map_select,]$statistics_name))
 }
 
 # Map selection code
@@ -151,4 +158,18 @@ update_seleted_polys <- function(id) {
                                                     bringToFront = TRUE),
                 label = location_poly$neighbourhood_name
                 )
+}
+
+render_select_map_plot <- function(stat) {
+  if(length(selected_locations) <= 0) return(renderPlotly(plot_ly()))
+  
+  location_ids <- c(locations[locations$neighbourhood_code %in% selected_locations, "locations_id"])
+  statistic_id <- as.numeric(statistics[statistics$statistics_variable == stat, "statistics_id"])
+
+  plot_facts <- facts[which(location_ids %in% facts$locations_id & facts$statistics_id == statistic_id), "value"]
+  print(plot_facts)
+  
+  plot <- plot_ly()
+  
+  return(renderPlotly(plot))
 }

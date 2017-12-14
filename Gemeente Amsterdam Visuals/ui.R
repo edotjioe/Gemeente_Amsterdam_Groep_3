@@ -63,15 +63,15 @@ ui <- dashboardPage(
         )
       ),
       conditionalPanel(
-        condition = "input.sidebar == 'vergelijkBuurten'",
+        condition = "input.sidebar == 'compare_neighbourhoods'",
         class = "filter-panel",
         selectInput(
-          "theme",
+          "theme_map_select",
           "Select theme",
           unique(statistics$theme_name)
         ),
         selectInput(
-          "stat",
+          "stat_map_select",
           "Select statistic",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )

@@ -9,8 +9,14 @@ server <- function(input, output, session) {
   }, add_to_map_selection(input$mapSelectMulti_shape_click))
 
   observeEvent({
+    input$mapSelectMulti_shape_click
+    input$stat_map_select
+  }, output$map_graph <- render_select_map_plot(input$stat_map_select))
+  
+  observeEvent({
     input$theme
-  }, update_stat_select(session, input$theme))
+    input$theme_map_select
+  }, update_stat_select(session, input$theme, input$theme_map_select))
   
   observeEvent({
     input$thema
