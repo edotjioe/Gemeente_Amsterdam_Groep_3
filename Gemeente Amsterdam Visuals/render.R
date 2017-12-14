@@ -5,7 +5,6 @@ render_map <- function(year, stat) {
   
   map_facts <- map_facts %>%
     right_join(locations, by = "locations_id")
-  print(head(map_facts))
 
   map <- leaflet(data = neightbourhood_map) %>%
     addTiles(group = "OSM",
@@ -30,6 +29,38 @@ render_map <- function(year, stat) {
       values = ~ map_facts$value,
       opacity = 0.9,
       title = statistics[stat_id, "statistics_name"]
+    )
+  
+  return(map)
+}
+
+colorPicker <- function(neighbourhood_code) {
+  # colors <- data.frame(code = character(0), color = character(0))
+  colors <- rbind(code = neighbourhood_code, color = "grey")
+  # colors[, "color"] = "grey"
+  
+  colors[which(colors$code == selected_locations), "color"] = "blue"
+  
+  return(colors$color)
+}
+
+render_select_map <- function(click) {
+  neightbourhood_map <- neightbourhood_map[]
+  map <- leaflet(data = neightbourhood_map) %>%
+    addTiles(group = "OSM",
+             options = providerTileOptions(minZoom = 10, maxZoom = 14)) %>%
+    addPolygons(
+      stroke = TRUE,
+      weight = 2,
+      smoothFactor = 1,
+      fillOpacity = 0.7,
+      color = colorPicker(~neightbourhood_map$Buurt_code),
+      highlightOptions = highlightOptions(
+        color = "red",
+        weight = 4,
+        bringToFront = TRUE
+      ),
+      layerId = ~ Buurt_code
     )
   
   return(map)
@@ -86,15 +117,13 @@ update_stat_select <- function(session, theme) {
 }
 
 # Map selection code
-# add_to_map_selection <- function(click) {
-#   if(click$id %in% selected_locations) {
-#     assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
-#   } else {
-#     assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
-#   }
-#   
-#   update_seleted_polys(click$id, year, stat)
-# }
+add_to_map_selection <- function(click) {
+  if(click$id %in% selected_locations) {
+    assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
+  } else {
+    assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
+  }
+}
 
 # update_seleted_polys <- function(id, year, stat) {
 #   leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
@@ -110,7 +139,7 @@ update_stat_select <- function(session, theme) {
 #     color <- ~pal(map_facts$value)[leaflet_map_index]
 #   }
 # 
-#   leafletProxy("map") %>%
+#   leafletProxy("map_graph") %>%
 #     removeShape(layerId = id) %>%
 #     addPolygons(layerId = id,
 #                 fillColor = color,

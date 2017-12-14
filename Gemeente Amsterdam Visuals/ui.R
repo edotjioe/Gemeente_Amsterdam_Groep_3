@@ -40,7 +40,7 @@ ui <- dashboardPage(
         tabName = "chart",
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk leefbaarheid", tabName = "stadsdeel"),
-        menuSubItem("Vergelijk buurten", tabName = "vergelijkBuurten")
+        menuSubItem("Vergelijk buurten", tabName = "compare_neighbourhoods")
       ),
       conditionalPanel(
         condition = "input.sidebar == 'stadsdeel'",
@@ -123,22 +123,22 @@ ui <- dashboardPage(
         plotlyOutput("stadsdeelchart")
       ),
       tabItem(
-        tabName = "vergelijkBuurten",
+        tabName = "compare_neighbourhoods",
         
         h2("Vergelijk buurten"),
         fluidRow(
           box(
-            id = "mapBox",
-            width = 12,
+            id = "map_box",
+            width = 6,
             title = "Selecteer de buurten die u wilt vergelijken",
             
-            leafletOutput("mapMultiSelect", width = "100%")
+            leafletOutput("mapSelectMulti", width = "100%")
           ),
           box(
-            id = "mapGraphBox",
-            width = 12,
+            id = "map_graph_box",
+            width = 6,
             
-            plotlyOutput("mapGraph")
+            plotlyOutput("map_graph")
           )
         )
         

@@ -1,8 +1,17 @@
 server <- function(input, output, session) {
   # Combine the selected variables into a new data frame
   map <- reactive(render_map(input$year, input$stat))
-  
   output$map <- renderLeaflet(map())
+  
+  select_map <- eventReactive( 
+    {
+      input$mapSelectMulti_shape_click
+      TRUE
+    },
+    render_select_map()
+  )
+  output$mapSelectMulti <- renderLeaflet(select_map())
+
 
   observeEvent({
     input$theme
@@ -17,7 +26,7 @@ server <- function(input, output, session) {
   output$datatable1 <- get_table(facts)
   
   # Map selection code
-  # observeEvent({
-  #   input$map_shape_click
-  # }, add_to_map_selection(input$map_shape_click, input$year, input$stat))
+  observeEvent({
+    input$mapSelectMulti_shape_click
+  }, add_to_map_selection(input$mapSelectMulti_shape_click))
 }
