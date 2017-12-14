@@ -8,6 +8,7 @@
 # install.packages("geojsonio")
 # install.packages("plotly")
 # install.packages("shinyjs")
+# install.packgess("DT")
 
 # Load all libraries here!
 library(shiny)
@@ -19,26 +20,21 @@ library(RMySQL)
 library(geojsonio)
 library(plotly)
 library(shinyjs)
+library(DT)
 
 load_map_neightbourhood <- function() {
   return(geojsonio::geojson_read("datafiles/GEBIED_BUURTEN.json", what = "sp", stringsAsFactor = FALSE))
 }
 
-load_map_facts <- function() {
-  facts <- get_query("SELECT * FROM facts WHERE year = 2017 AND statistics_id = 1")
-  locations <- load_map_locations()
-  
-  temp <- facts[which(facts$year == 2017 & facts$statistics_id == 1), ]
-  map_fact <- data.frame(locations, value = temp[match(locations$locations_id, temp$locations_id), "value"])
-  
-  return(map_fact)
+load_facts <- function() {
+  return(get_query("SELECT * FROM facts"))
 }
 
-load_map_statistics <- function() {
+load_statistics <- function() {
   return(get_query("SELECT * FROM statistics"))
 }
 
-load_map_locations <- function() {
+load_locations <- function() {
   locations <- get_query("SELECT * FROM locations")
   
   temp <- load_map_neightbourhood()
@@ -57,9 +53,9 @@ create_various_variables <- function() {
 
 # Create environment variables
 print("Running init.R")
-locations <- load_map_locations()
-statistics <- load_map_statistics()
-map_fact <- load_map_facts()
+locations <- load_locations()
+statistics <- load_statistics()
+facts <- load_facts()
 neightbourhood_map <- load_map_neightbourhood()
 pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
