@@ -211,7 +211,6 @@ render_select_map_plot <- function(stat) {
   }
   
   plot_facts <- left_join(plot_facts, locations)
-  print(plot_facts)
   
   plot <- plot_facts %>%
     group_by(locations_id) %>%
@@ -222,7 +221,8 @@ render_select_map_plot <- function(stat) {
       color = ~neighbourhood_name,
       type = "scatter",
       mode = "lines"
-    )
+    ) %>%
+    layout(yaxis = list(title = statistics[statistic_id,]$statistics_name), xaxis = list(title = "Year"))
   
   return(renderPlotly(plot))
 }
