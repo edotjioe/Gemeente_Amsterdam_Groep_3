@@ -23,6 +23,13 @@ server <- function(input, output, session) {
     input$stadsdeel1
     input$stadsdeel2
   }, output$stadsdeelchart <- render_graph(input$thema, input$stadsdeel1, input$stadsdeel2))
+  
+  observeEvent({
+    input$themaC
+    input$stadsdeel1C
+    input$stadsdeel2C
+  }, output$stadsdeelchart2 <- render_graph2(input$themaC, input$stadsdeel1C, input$stadsdeel2C))
+  
   # Table
   output$datatable1 <- get_table(facts)
 }

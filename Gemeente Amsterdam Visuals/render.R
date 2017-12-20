@@ -110,6 +110,44 @@ render_graph <- function(theme, city_district1, city_district2) {
   return(plot)
 }
 
+render_graph2 <- function(theme, city_district1, city_district2) {
+  plot <- renderPlotly({
+    # 1 - percentage
+    # 2 - absoluut
+    # 3 - rapportcijfer
+    # 4 - index
+    # 5 - gemiddelde
+    # 6 - per 1000
+    # 7 - 5-puntsschaal
+    # 8 - coefficient
+    
+    statistics_id <- statistics %>%
+      filter(statistics_variable == theme) %>%
+      select(statistics_id)
+    
+    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
+    
+    chart_data <- factscompare %>% 
+      inner_join(locations, by = "locations_id") %>%
+      inner_join(statistics, by = "statistics_id")
+    
+    stad1 <- chart_data %>%
+      filter(neighbourhood_name == city_district1)
+    stad2 <- chart_data %>%
+      filter(neighbourhood_name == city_district2)
+    
+    final <- data.frame(unique(chart_data$year), 
+                        stad1$value, 
+                        stad2$value)
+    
+    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
+             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+             config(displayModeBar = FALSE))
+  })
+  
+  return(plot)
+}
+
 # Render the stat dropdown based on the selected theme
 update_stat_select <- function(session, theme, theme_map_select) {
   updateSelectInput(session,
@@ -173,7 +211,6 @@ render_select_map_plot <- function(stat) {
   }
   
   plot_facts <- left_join(plot_facts, locations)
-  print(plot_facts)
   
   plot <- plot_facts %>%
     group_by(locations_id) %>%
@@ -184,7 +221,8 @@ render_select_map_plot <- function(stat) {
       color = ~neighbourhood_name,
       type = "scatter",
       mode = "lines"
-    )
+    ) %>%
+    layout(yaxis = list(title = statistics[statistic_id,]$statistics_name), xaxis = list(title = "Year"))
   
   return(renderPlotly(plot))
 }
