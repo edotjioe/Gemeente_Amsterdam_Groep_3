@@ -13,8 +13,8 @@ get_query <- function(query) {
   con <- connect_db()
   
   result <- dbGetQuery(con, query)
-  
+
   dbDisconnect(con)  
-  
+
   return(result)
 }
