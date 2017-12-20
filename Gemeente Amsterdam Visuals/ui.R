@@ -119,6 +119,27 @@ ui <- dashboardPage(
         
         h2("Vergelijk buurten op leefbaarheid:"),
         plotlyOutput("stadsdeelchart2")
+      ),
+      tabItem(
+        tabName = "compare_neighbourhoods",
+        
+        h2("Vergelijk buurten"),
+        fluidRow(
+          box(
+            id = "map_box",
+            width = 6,
+            title = "Selecteer de buurten die u wilt vergelijken",
+            
+            leafletOutput("mapSelectMulti", width = "100%")
+          ),
+          box(
+            id = "map_graph_box",
+            width = 6,
+            
+            plotlyOutput("map_graph")
+          )
+        )
+        
       )
     )
   )
