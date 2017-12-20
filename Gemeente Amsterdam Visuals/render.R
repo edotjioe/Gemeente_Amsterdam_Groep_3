@@ -67,7 +67,7 @@ render_select_map <- function(click) {
 
 # Display plot under the datatable
 get_table <- function(df) {
-  DT::renderDataTable(df, options = list(pageLength = 50))
+  DT::renderDataTable(df, filter = 'top', options = list(pageLength = 50))
 }
 
 render_graph <- function(theme, city_district1, city_district2) {
