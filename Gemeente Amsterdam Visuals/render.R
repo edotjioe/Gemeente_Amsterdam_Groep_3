@@ -5,9 +5,8 @@ render_map <- function(year, stat) {
   
   map_facts <- map_facts %>%
     right_join(locations, by = "locations_id")
-  print(head(map_facts))
-
-  map <- leaflet(data = neightbourhood_map) %>%
+  
+  map <- leaflet(data = neighbourhood_map) %>%
     addTiles(group = "OSM",
              options = providerTileOptions(minZoom = 12, maxZoom = 14)) %>%
     addPolygons(
@@ -30,6 +29,37 @@ render_map <- function(year, stat) {
       values = ~ map_facts$value,
       opacity = 0.9,
       title = statistics[stat_id, "statistics_name"]
+    )
+  
+  return(map)
+}
+
+colorPicker <- function(neighbourhood_code) {
+  colors <- data.frame(code = neighbourhood_code)
+  colors$color <- "grey"
+  
+  colors[which(colors$code == selected_locations), "color"] = "blue"
+  
+  return(colors$color)
+}
+
+render_select_map <- function(click) {
+  map <- leaflet(data = neighbourhood_map) %>%
+    addTiles(group = "OSM",
+             options = providerTileOptions(minZoom = 10, maxZoom = 14)) %>%
+    addPolygons(
+      stroke = TRUE,
+      weight = 2,
+      smoothFactor = 1,
+      fillOpacity = 0.7,
+      color = colorPicker(neighbourhood_map$Buurt_code),
+      highlightOptions = highlightOptions(
+        color = "red",
+        weight = 4,
+        bringToFront = TRUE
+      ),
+      label = neighbourhood_map$Buurt,
+      layerId = ~ Buurt_code
     )
   
   return(map)
@@ -73,8 +103,8 @@ render_graph <- function(theme, city_district1, city_district2) {
                         stad2$value)
     
     return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
-      add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
-      config(displayModeBar = FALSE))
+             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+             config(displayModeBar = FALSE))
   })
   
   return(plot)
@@ -119,48 +149,80 @@ render_graph2 <- function(theme, city_district1, city_district2) {
 }
 
 # Render the stat dropdown based on the selected theme
-update_stat_select <- function(session, theme) {
-  return(updateSelectInput(session, "stat", choices = split(statistics[statistics$theme_name == theme,]$statistics_variable, statistics[statistics$theme_name == theme,]$statistics_name)))
+update_stat_select <- function(session, theme, theme_map_select) {
+  updateSelectInput(session,
+                    "stat",
+                    choices = split(statistics[statistics$theme_name == theme,]$statistics_variable,
+                                    statistics[statistics$theme_name == theme,]$statistics_name))
+  updateSelectInput(session,
+                    "stat_map_select",
+                    choices = split(statistics[statistics$theme_name == theme_map_select,]$statistics_variable,
+                                    statistics[statistics$theme_name == theme_map_select,]$statistics_name))
 }
 
 # Map selection code
-# add_to_map_selection <- function(click) {
-#   if(click$id %in% selected_locations) {
-#     assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
-#   } else {
-#     assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
-#   }
-#   
-#   update_seleted_polys(click$id, year, stat)
-# }
+add_to_map_selection <- function(click) {
+  if(click$id %in% selected_locations) {
+    assign("selected_locations", selected_locations[which(click$id != selected_locations)], envir = globalenv())
+  } else {
+    assign("selected_locations", c(selected_locations, click$id), envir = globalenv())
+  }
+  
+  update_seleted_polys(click$id)
+}
 
-# update_seleted_polys <- function(id, year, stat) {
-#   leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
-# 
-#   stat_id <- statistics[which(statistics$statistics_variable == stat)]$statistics_id
-#   map_facts <- facts[which(facts$year == year && facts$statistics_id == stat_id)]
-# 
-#   location_poly <- map_facts[leaflet_map_index,]
-# 
-#   if(id %in% selected_locations) {
-#     color <- "blue"
-#   } else {
-#     color <- ~pal(map_facts$value)[leaflet_map_index]
-#   }
-# 
-#   leafletProxy("map") %>%
-#     removeShape(layerId = id) %>%
-#     addPolygons(layerId = id,
-#                 fillColor = color,
-#                 data = neightbourhood_map[leaflet_map_index,],
-#                 stroke = TRUE,
-#                 weight = 2,
-#                 smoothFactor = 1,
-#                 fillOpacity = 0.7,
-#                 color = "white",
-#                 highlightOptions = highlightOptions(color = "red",
-#                                                     weight = 4,
-#                                                     bringToFront = TRUE),
-#                 label = paste(location_poly$neighbourhood_name, " - ", location_poly$value)
-#                 )
-# }
+update_seleted_polys <- function(id) {
+  leaflet_map_index <- as.numeric(match(id, locations$neighbourhood_code))
+  location_poly <- locations[leaflet_map_index,]
+  
+  if(id %in% selected_locations) {
+    color <- "blue"
+  } else {
+    color <- "grey"
+  }
+  
+  leafletProxy("mapSelectMulti") %>%
+    removeShape(layerId = id) %>%
+    addPolygons(layerId = id,
+                fillColor = color,
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "grey",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = location_poly$neighbourhood_name
+    )
+}
+
+render_select_map_plot <- function(stat) {
+  if(length(selected_locations) <= 0) return(renderPlotly(plot_ly()))
+  
+  location_ids <- locations[match(selected_locations, locations$neighbourhood_code),]$locations_id
+  statistic_id <- as.numeric(statistics[statistics$statistics_variable == stat, "statistics_id"])
+  
+  plot_facts <- data.frame()
+  
+  for(i in location_ids){
+    plot_facts <- rbind(plot_facts, facts[facts$locations_id == i & facts$statistics_id == statistic_id, ])
+  }
+  
+  plot_facts <- left_join(plot_facts, locations)
+  print(plot_facts)
+  
+  plot <- plot_facts %>%
+    group_by(locations_id) %>%
+    plot_ly(
+      x = ~year, 
+      y = ~value, 
+      name = ~neighbourhood_name,
+      color = ~neighbourhood_name,
+      type = "scatter",
+      mode = "lines"
+    )
+  
+  return(renderPlotly(plot))
+}
