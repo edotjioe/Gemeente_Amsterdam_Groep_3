@@ -52,7 +52,8 @@ render_select_map <- function(click) {
       weight = 2,
       smoothFactor = 1,
       fillOpacity = 0.7,
-      color = colorPicker(neighbourhood_map$Buurt_code),
+      color = "white",
+      fillColor = colorPicker(neighbourhood_map$Buurt_code),
       highlightOptions = highlightOptions(
         color = "red",
         weight = 4,
@@ -162,14 +163,22 @@ update_seleted_polys <- function(id) {
 
 render_select_map_plot <- function(stat) {
   if(length(selected_locations) <= 0) return(renderPlotly(plot_ly()))
-  
-  location_ids <- c(locations[locations$neighbourhood_code %in% selected_locations, "locations_id"])
-  statistic_id <- as.numeric(statistics[statistics$statistics_variable == stat, "statistics_id"])
 
-  plot_facts <- facts[which(location_ids %in% facts$locations_id & facts$statistics_id == statistic_id), "value"]
+  location_ids <- locations[match(selected_locations, locations$neighbourhood_code),]$locations_id
+  statistic_id <- statistics[stat == statistics$statistics_variable,]$statistics_id
+  
+  plot_facts <- facts[location_ids == facts$locations_id,]
+  print(plot_facts)
+  plot_facts <- plot_facts[statistic_id == plot_facts$statistics_id,]
   print(plot_facts)
   
-  plot <- plot_ly()
-  
+  plot <- plot_facts %>%
+    group_by(locations_id) %>%
+    plot_ly(
+      x = ~year,
+      y = ~value,
+      type = "scatter",
+      mode = "lines")
+
   return(renderPlotly(plot))
 }
