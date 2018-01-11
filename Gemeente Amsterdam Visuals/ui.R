@@ -41,7 +41,8 @@ ui <- dashboardPage(
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
         menuSubItem("Vergelijk buurten", tabName = "chart"),
-        menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods")
+        menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
+        menuSubItem("Correlation", tabName = "Correlation")
       ),
       conditionalPanel(
         condition = "input.sidebar == 'stadsdeel'",
@@ -152,6 +153,39 @@ ui <- dashboardPage(
             width = 6,
             
             plotlyOutput("map_graph")
+          )
+        )
+        
+      ),
+      tabItem(
+        tabName = "Correlation",
+        
+        h2("Correlation"),
+        fluidPage(
+          column(
+            5,
+            box(
+              id = "map_box",
+              width = 12,
+              title = "",
+              
+              leafletOutput("mapSelectCorr", width = "100%")
+            )
+          ),
+          column(
+            7,
+            box(
+              id = "corr_graph_box_1",
+              width = 12,
+              
+              plotlyOutput("corr_graph_1")
+            ),
+            box(
+              id = "corr_graph_box_2",
+              width = 12,
+              
+              plotlyOutput("corr_graph_2")
+            )
           )
         )
         
