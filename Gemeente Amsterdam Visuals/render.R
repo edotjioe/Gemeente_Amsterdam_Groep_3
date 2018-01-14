@@ -148,16 +148,31 @@ render_graph2 <- function(theme, city_district1, city_district2) {
   return(plot)
 }
 
+render_graph3 <- function(stat1, stat2, location) {
+  plot <- renderPlotly({
+    
+    statistics_id <- statistics %>%
+      filter(statistics_variable == theme) %>%
+      select(statistics_id)
+    
+    stat1 <- facts[facts$statistics_id == stat1 & facts$locations_id == location, c(4, 5)]
+    stat1 <- facts[facts$statistics_id == stat2 & facts$locations_id == location, c(4, 5)]
+    
+    return(plot_ly() %>%
+             add_trace(x = stat1$value, y = stat1$year, name = paste0(), mode = 'lines') %>%
+             add_trace(x = stat2$value, y = stat2) %>%
+             config(displayModeBar = FALSE))
+  })
+  
+  return(plot)
+}
+
 # Render the stat dropdown based on the selected theme
-update_stat_select <- function(session, theme, theme_map_select) {
+update_stat_select <- function(session, theme, input_select) {
   updateSelectInput(session,
-                    "stat",
+                    input_select,
                     choices = split(statistics[statistics$theme_name == theme,]$statistics_variable,
                                     statistics[statistics$theme_name == theme,]$statistics_name))
-  updateSelectInput(session,
-                    "stat_map_select",
-                    choices = split(statistics[statistics$theme_name == theme_map_select,]$statistics_variable,
-                                    statistics[statistics$theme_name == theme_map_select,]$statistics_name))
 }
 
 # Map selection code

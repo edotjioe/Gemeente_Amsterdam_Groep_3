@@ -14,9 +14,30 @@ server <- function(input, output, session) {
   }, output$map_graph <- render_select_map_plot(input$stat_map_select))
   
   observeEvent({
-    input$theme
     input$theme_map_select
-  }, update_stat_select(session, input$theme, input$theme_map_select))
+  }, update_stat_select(session, input$theme, "stat"))
+  
+  observeEvent({
+    input$theme_map_select
+  }, update_stat_select(session, input$theme_map_select, "stat_map_select"))
+  
+  observeEvent({
+    input$theme_corr_select_1
+    input$theme_corr_select_2
+    input$stat_corr_select_1
+    input$stat_corr_select_2
+  }, 
+  {
+    update_stat_select(session, input$theme_corr_select_1, "stat_corr_select_1")
+    update_stat_select(session, input$theme_corr_select_2, "stat_corr_select_2")
+    
+    
+  })
+  
+  
+  observeEvent({
+    input$theme_corr_select_2
+  }, update_stat_select(session, input$theme_corr_select_2, "stat_corr_select_2"))
   
   observeEvent({
     input$thema

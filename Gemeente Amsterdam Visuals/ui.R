@@ -98,6 +98,37 @@ ui <- dashboardPage(
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
+      # Correlation Filter Panel -----------------------------------------------------------------------------------
+      conditionalPanel(
+        condition = "input.sidebar == 'Correlation'",
+        class = "filter-panel",
+        selectInput(
+          "theme_corr_select_1",
+          "Select theme",
+          correlation_themes
+        ),
+        selectInput(
+          "stat_corr_select_1",
+          "Select statistic",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
+        ),
+        selectInput(
+          "theme_corr_select_2",
+          "Select theme",
+          correlation_themes
+        ),
+        selectInput(
+          "stat_corr_select_2",
+          "Select statistic",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
+        ),
+        selectInput(
+          "neighboorhoud_corr",
+          "Kies een buurt:",
+          unique(sort(locations$neighbourhood_name)),
+          selected = "Osdorp Zuidoost"
+        )
+      ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
       sidebarMenuOutput("dynamicsidebar")
     )
