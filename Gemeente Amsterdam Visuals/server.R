@@ -24,14 +24,18 @@ server <- function(input, output, session) {
   observeEvent({
     input$theme_corr_select_1
     input$theme_corr_select_2
-    input$stat_corr_select_1
-    input$stat_corr_select_2
   }, 
   {
     update_stat_select(session, input$theme_corr_select_1, "stat_corr_select_1")
     update_stat_select(session, input$theme_corr_select_2, "stat_corr_select_2")
-    
-    
+  })
+  
+  observeEvent({
+    input$stat_corr_select_1
+    input$stat_corr_select_2
+    input$neighboorhoud_corr
+  }, {
+    output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$neighboorhoud_corr)
   })
   
   

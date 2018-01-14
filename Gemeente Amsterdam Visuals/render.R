@@ -72,14 +72,6 @@ get_table <- function(df) {
 
 render_graph <- function(theme, city_district1, city_district2) {
   plot <- renderPlotly({
-    # 1 - percentage
-    # 2 - absoluut
-    # 3 - rapportcijfer
-    # 4 - index
-    # 5 - gemiddelde
-    # 6 - per 1000
-    # 7 - 5-puntsschaal
-    # 8 - coefficient
     
     statistics_id <- statistics %>%
       filter(statistics_variable == theme) %>%
@@ -151,17 +143,20 @@ render_graph2 <- function(theme, city_district1, city_district2) {
 render_graph3 <- function(stat1, stat2, location) {
   plot <- renderPlotly({
     
-    statistics_id <- statistics %>%
-      filter(statistics_variable == theme) %>%
-      select(statistics_id)
+    statistics_id_1 <- statistics[statistics$statistics_variable == stat1, "statistics_id"]
+    statistics_id_2 <- statistics[statistics$statistics_variable == stat2, "statistics_id"]
     
-    stat1 <- facts[facts$statistics_id == stat1 & facts$locations_id == location, c(4, 5)]
-    stat1 <- facts[facts$statistics_id == stat2 & facts$locations_id == location, c(4, 5)]
+    neighbourhood_id <- locations[locations$district_name == input$neighboorhoud_corr, "locations_id"]
     
-    return(plot_ly() %>%
-             add_trace(x = stat1$value, y = stat1$year, name = paste0(), mode = 'lines') %>%
-             add_trace(x = stat2$value, y = stat2) %>%
-             config(displayModeBar = FALSE))
+    stat1_df <- facts[facts$statistics_id == statistics_id_1 & facts$locations_id == neighbourhood_id, c(4, 5)]
+    stat2_df <- facts[facts$statistics_id == statistics_id_2 & facts$locations_id == neighbourhood_id, c(4, 5)]
+    
+    return(
+         plot_ly(x = stat1_df$value, y = stat1_df$year) #%>%
+         #add_trace(x = stat1$value, y = stat1$year, name = paste0(), mode = 'lines') #%>%
+         # add_trace(x = stat2$value, y = stat2) %>%
+         # config(displayModeBar = FALSE)
+       )
   })
   
   return(plot)
