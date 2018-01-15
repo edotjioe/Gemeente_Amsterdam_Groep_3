@@ -70,39 +70,43 @@ get_table <- function(df) {
   DT::renderDataTable(df, filter = 'top', options = list(pageLength = 50))
 }
 
-render_graph <- function(theme, city_district1, city_district2) {
+# Comparing districts per theme (line graph)
+render_graph <- function(theme, district_one, district_two) {
   plot <- renderPlotly({
     
-    statistics_id <- statistics %>%
+    theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-    
-    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
-    
+
+    factscompare <- facts %>%
+      filter(statistics_id == as.numeric(theme_id)) %>%
+      select(value, statistics_id, locations_id, year)
+
     chart_data <- factscompare %>% 
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id") %>%
       group_by(year, district_name) %>%
       summarise(value = sum(value))
     
-    stad1 <- chart_data %>%
-      filter(district_name == city_district1)
-    stad2 <- chart_data %>%
-      filter(district_name == city_district2)
+    district_one <- chart_data %>%
+      filter(district_name == district_one)
+    district_two <- chart_data %>%
+      filter(district_name == district_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        stad1$value, 
-                        stad2$value)
+                        district_one$value, 
+                        district_two$value)
     
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+    return(plot_ly(final, x = final$unique.chart_data.year., y = final$district_one.value, name = district_one$district_name, type = 'scatter', mode = 'lines') %>%
+             add_trace(y = final$district_two.value, name = district_two$district_name, mode = 'lines') %>%
              config(displayModeBar = FALSE))
   })
   
   return(plot)
 }
 
-render_graph2 <- function(theme, city_district1, city_district2) {
+# Comparing neighbourhoods per theme (line graph)
+render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
   plot <- renderPlotly({
     # 1 - percentage
     # 2 - absoluut
@@ -113,27 +117,29 @@ render_graph2 <- function(theme, city_district1, city_district2) {
     # 7 - 5-puntsschaal
     # 8 - coefficient
     
-    statistics_id <- statistics %>%
+    theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-    
-    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
+
+    factscompare <- facts %>%
+      filter(statistics_id == as.numeric(theme_id)) %>%
+      select(value, statistics_id, locations_id, year)
     
     chart_data <- factscompare %>% 
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id")
     
-    stad1 <- chart_data %>%
-      filter(neighbourhood_name == city_district1)
-    stad2 <- chart_data %>%
-      filter(neighbourhood_name == city_district2)
+    neighbourhood_one <- chart_data %>%
+      filter(neighbourhood_name == neighbourhood_one)
+    neighbourhood_two <- chart_data %>%
+      filter(neighbourhood_name == neighbourhood_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        stad1$value, 
-                        stad2$value)
-    
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+                        neighbourhood_one$value, 
+                        neighbourhood_two$value)
+    str(neighbourhood_one)
+    return(plot_ly(final, x = final$unique.chart_data.year., y = final$neighbourhood_one.value, name = neighbourhood_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
+             add_trace(y = final$neighbourhood_two.value, name = neighbourhood_two$neighbourhood_name, mode = 'lines') %>%
              config(displayModeBar = FALSE))
   })
   
