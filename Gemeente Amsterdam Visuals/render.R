@@ -129,42 +129,65 @@ render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id")
     
-    neighbourhood_one <- chart_data %>%
+    neighbourhood_data_one <- chart_data %>%
       filter(neighbourhood_name == neighbourhood_one)
-    neighbourhood_two <- chart_data %>%
+    neighbourhood_data_two <- chart_data %>%
       filter(neighbourhood_name == neighbourhood_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        neighbourhood_one$value, 
-                        neighbourhood_two$value)
-    str(neighbourhood_one)
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$neighbourhood_one.value, name = neighbourhood_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$neighbourhood_two.value, name = neighbourhood_two$neighbourhood_name, mode = 'lines') %>%
-             config(displayModeBar = FALSE))
+                        neighbourhood_data_one$value, 
+                        neighbourhood_data_two$value)
+
+    return(
+      plot_ly(final, x = final$unique.chart_data.year., y = final$neighbourhood_data_one, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
+      add_trace(y = final$neighbourhood_data_two.value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
+      config(displayModeBar = FALSE))
   })
   
   return(plot)
 }
 
-render_graph3 <- function(stat1, stat2, location) {
+render_graph3 <- function(statistic_one, statistic_two, location) {
   plot <- renderPlotly({
+    statistic_id_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_id"]
+    statistic_id_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_id"]
     
-    statistics_id_1 <- statistics[statistics$statistics_variable == stat1, "statistics_id"]
-    statistics_id_2 <- statistics[statistics$statistics_variable == stat2, "statistics_id"]
+    neighbourhood_id <- as.numeric(locations[locations$neighbourhood_name == location, "locations_id"])
     
-    neighbourhood_id <- locations[locations$district_name == input$neighboorhoud_corr, "locations_id"]
-    
-    stat1_df <- facts[facts$statistics_id == statistics_id_1 & facts$locations_id == neighbourhood_id, c(4, 5)]
-    stat2_df <- facts[facts$statistics_id == statistics_id_2 & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
     
     return(
-         plot_ly(x = stat1_df$value, y = stat1_df$year) #%>%
-         #add_trace(x = stat1$value, y = stat1$year, name = paste0(), mode = 'lines') #%>%
-         # add_trace(x = stat2$value, y = stat2) %>%
+         plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_one, type = 'scatter', mode = 'lines') %>%
+         add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_two, mode = 'lines')
          # config(displayModeBar = FALSE)
+         # add_trace(x = stat2$value, y = stat2) %>%
+
        )
   })
-  
+  return(plot)
+}
+
+render_graph4 <- function(statistic_one, statistic_two, location) {
+  plot <- renderPlotly({
+    statistic_id_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_id"]
+    statistic_id_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_id"]
+    
+    neighbourhood_id <- as.numeric(locations[locations$neighbourhood_name == location, "locations_id"])
+    
+    statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
+    
+    min_index <- max(min(statistic_one_df$year), min(statistic_two_df$year))
+    max_index <- min(max(statistic_one_df$year), max(statistic_two_df$year))
+    
+    statistic_one_df <- statistic_one_df[statistic_one_df$year > min_index & statistic_one_df$year < max_index,]
+    statistic_two_df <- statistic_two_df[statistic_two_df$year > min_index & statistic_two_df$year < max_index,]
+
+    return(
+      plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, xlab = statistic_one, ylab = statistic_two, type = 'scatter')
+    )
+  })
   return(plot)
 }
 

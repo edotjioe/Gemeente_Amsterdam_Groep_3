@@ -36,6 +36,7 @@ server <- function(input, output, session) {
     input$neighboorhoud_corr
   }, {
     output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$neighboorhoud_corr)
+    output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$neighboorhoud_corr)
   })
   
   
