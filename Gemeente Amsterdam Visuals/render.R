@@ -88,17 +88,17 @@ render_graph <- function(theme, district_one, district_two) {
       group_by(year, district_name) %>%
       summarise(value = sum(value))
     
-    district_one <- chart_data %>%
+    district_data_one <- chart_data %>%
       filter(district_name == district_one)
-    district_two <- chart_data %>%
+    district_data_two <- chart_data %>%
       filter(district_name == district_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        district_one$value, 
-                        district_two$value)
+                        district_data_one$value, 
+                        district_data_two$value)
     
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$district_one.value, name = district_one$district_name, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$district_two.value, name = district_two$district_name, mode = 'lines') %>%
+    return(plot_ly(final, x = final$unique.chart_data.year, y = final$district_data_one.value, name = district_data_one$district_name, type = 'scatter', mode = 'lines') %>%
+             add_trace(y = final$district_data_two.value, name = district_data_two$district_name, mode = 'lines') %>%
              config(displayModeBar = FALSE))
   })
   
@@ -139,7 +139,7 @@ render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
                         neighbourhood_data_two$value)
 
     return(
-      plot_ly(final, x = final$unique.chart_data.year., y = final$neighbourhood_data_one, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
+      plot_ly(final, x = final$unique.chart_data.year, y = final$neighbourhood_data_one, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
       add_trace(y = final$neighbourhood_data_two.value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
       config(displayModeBar = FALSE))
   })
@@ -157,12 +157,13 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
     statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
     statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
     
-    return(
-         plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_one, type = 'scatter', mode = 'lines') %>%
-         add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_two, mode = 'lines')
-         # config(displayModeBar = FALSE)
-         # add_trace(x = stat2$value, y = stat2) %>%
+    statistic_name_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_name"]
+    statistic_name_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_name"]
 
+    return(
+         plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_name_one, type = 'scatter', mode = 'lines') %>%
+         add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_name_two, mode = 'lines') %>%
+         layout(legend = list(orientation = 'h'))
        )
   })
   return(plot)
@@ -183,9 +184,13 @@ render_graph4 <- function(statistic_one, statistic_two, location) {
     
     statistic_one_df <- statistic_one_df[statistic_one_df$year > min_index & statistic_one_df$year < max_index,]
     statistic_two_df <- statistic_two_df[statistic_two_df$year > min_index & statistic_two_df$year < max_index,]
-
+    
+    statistic_name_one <- list(title = statistics[statistics$statistics_variable == statistic_one, "statistics_name"])
+    statistic_name_two <- list(title = statistics[statistics$statistics_variable == statistic_two, "statistics_name"])
+    
     return(
-      plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, xlab = statistic_one, ylab = statistic_two, type = 'scatter')
+      plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, type = 'scatter') %>%
+      layout(xaxis = statistic_name_one, yaxis = statistic_name_two)
     )
   })
   return(plot)
