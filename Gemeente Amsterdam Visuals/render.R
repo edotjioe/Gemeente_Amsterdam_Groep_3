@@ -66,8 +66,20 @@ render_select_map <- function(click) {
 }
 
 # Display plot under the datatable
-get_table <- function(df) {
-  DT::renderDataTable(df, filter = 'top', options = list(pageLength = 50))
+get_facts_table <- function() {
+  df <- facts
+  
+  df <- merge(df, locations, by = "locations_id")
+  df <- merge(df, statistics, by = "statistics_id")
+  units <- data.frame("unit_id" = c(1, 2, 3, 4, 5, 6, 7, 8), "unit_name" = c("%", "Absoluut", "Rapport", "Index", "Gemiddelde", "Per 1000", "5-puntsschaal", "Coefficient"))
+  df <- merge(df, units, by.x = "statistics_unit", by.y = "unit_id")
+  
+  selectedCols <- c("statistics_name", "neighbourhood_name", "year", "value", "unit_name")
+  colNames <- c("Statestiek", "Buurt", "Jaar", "Waarde", "Eenheid")
+  
+  df <- df[, selectedCols]
+  
+  return(DT::renderDataTable(df, filter = "top", options = list(pageLength = 50), colnames = colNames))
 }
 
 # Comparing districts per theme (line graph)

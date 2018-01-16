@@ -5,7 +5,7 @@ source("render.R")
 
 ui <- dashboardPage(
   skin = "red",
-  dashboardHeader(title = "Amsterdam Statistieken", titleWidth = 300),
+  dashboardHeader(title = "Amsterdam Statistiek", titleWidth = 300),
   dashboardSidebar(
     width = 300,
     sidebarMenu(
@@ -38,7 +38,7 @@ ui <- dashboardPage(
       ),
       # Menu ------------------------------------------------------------------------------------------------------------
       menuItem(
-        "Charts",
+        "Grafieken",
         tabName = "chart",
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
@@ -94,12 +94,12 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_map_select",
-          "Select theme",
+          "Selecteer thema",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat_map_select",
-          "Select statistic",
+          "Selecteer statistiek",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
@@ -147,7 +147,50 @@ ui <- dashboardPage(
     # Dashboard tab ----------------------------------------------------------------------------------------------------------------
     tabItems(
       tabItem(tabName = "dashboard",
-              h2("Dashboard")),
+        fluidPage(
+          fluidRow(
+            column(1,
+                  img(src = "amsterdam.png", height = "100px")
+                   )
+          ),
+          fluidRow(
+            h5("Welkom, Amsterdammer!"),
+            
+            h5("Voor u ziet u de totaal vernieuwde applicatie van de afdeling Onderzoek, Informatie en Statistiek van de Gemeente Amsterdam. Deze applicatie voorziet u van verschillende kerncijfers en informatie over de stadsdelen en buurten in Amsterdam. Deze informatie is gericht op het informeren van de inwoners van Amsterdam op het gebied van leefbaarheid."),
+            
+            h5("De volgende drie dingen kunnen in de applicatie worden gedaan:"),
+            
+            h5("1. Informatie over alle buurten van Amsterdam met betrekking tot de leefbaarheid in de buurt."),
+            
+            h5("2. Vergelijken van verschillende buurten, waarbij je statistieken kan vergelijken en verbanden kunt vinden."),
+            
+            h5("3. Datatabel om alle data te bekijken."),
+            
+            h5("De afdeling Onderzoek, Informatie en Statistiek (OIS) voorziet Amsterdam van informatie over de stad. Het vergaren van informatie gebeurt door middel van eigen onderzoek en door het raadplegen van onderzoek en kennis van buiten. Zij adviseren en faciliteren bij de totstandkoming van de gegevens data en de toegankelijkheid daarvan. Op de website van OIS is het mogelijk om informatie over de stad terug te vinden en op te halen. Er zijn verschillende feiten en cijfers te vinden over de stad welke ook gevisualiseerd zijn. Door op een van deze visualisaties te klikken opent er een scherm waarin het mogelijk is om informatie op te vragen over het gekozen onderwerp.")
+          ),
+          tags$head(
+            tags$style(HTML('#run{background-color: #f2f2f2}'))
+          ),
+          fillRow(
+            style = "margin-top: 50px;",
+            
+            column(12, align = "center",
+              actionButton("button_map", label = img(src = "map.png", height = "100px")),
+              h5("Interactieve Map")
+            ),
+            
+            column(12, align = "center",
+             actionButton("button_chart", label = img(src = "chart.png", height = "100px")),
+             h5("Grafieken")
+            ),
+            
+            column(12, align = "center",
+             actionButton("button_data", label = img(src = "dataexplorer.png", height = "100px")),
+             h5("Data Explorer")
+            )
+          )
+        )     
+      ),
       tabItem(
         tabName = "map",
         
