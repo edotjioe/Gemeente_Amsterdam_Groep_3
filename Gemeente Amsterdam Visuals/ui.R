@@ -36,7 +36,7 @@ ui <- dashboardPage(
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
       ),
       menuItem(
-        "Charts",
+        "Grafieken",
         tabName = "chart",
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
@@ -88,12 +88,12 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_map_select",
-          "Select theme",
+          "Selecteer thema",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat_map_select",
-          "Select statistic",
+          "Selecteer statistiek",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
@@ -137,12 +137,12 @@ ui <- dashboardPage(
             
             column(12, align = "center",
               actionButton("button_map", label = img(src = "map.png", height = "100px")),
-              h5("Map")
+              h5("Interactieve Map")
             ),
             
             column(12, align = "center",
              actionButton("button_chart", label = img(src = "chart.png", height = "100px")),
-             h5("Chart")
+             h5("Grafieken")
             ),
             
             column(12, align = "center",
