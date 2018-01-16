@@ -157,13 +157,22 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
     statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
     statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
     
+    #s_one <- scale(as.matrix(statistic_one_df$value))
+    #s_two <- scale(as.matrix(statistic_two_df$value))
+
+    # Normalisatie deel
+    s_one <- (statistic_one_df$value-min(statistic_one_df$value))/(max(statistic_one_df$value)-min(statistic_one_df$value))
+    s_two <- (statistic_two_df$value-min(statistic_two_df$value))/(max(statistic_two_df$value)-min(statistic_two_df$value))
+    # print(s_one)
+    # print(s_two)
+
     statistic_name_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_name"]
     statistic_name_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_name"]
 
     return(
          plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_name_one, type = 'scatter', mode = 'lines') %>%
          add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_name_two, mode = 'lines') %>%
-         layout(legend = list(orientation = 'h'))
+         layout(legend = list(orientation = 'h'), title = "Vergelijking lijngrafiek")
        )
   })
   return(plot)
@@ -190,10 +199,88 @@ render_graph4 <- function(statistic_one, statistic_two, location) {
     
     return(
       plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, type = 'scatter') %>%
-      layout(xaxis = statistic_name_one, yaxis = statistic_name_two)
+      layout(xaxis = statistic_name_one, yaxis = statistic_name_two, title = "Correlatie grafiek")
     )
   })
   return(plot)
+}
+
+# Initiate correlation map 
+correlation_map <- function() {
+  leaflet_map_index <- as.numeric(match(selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  
+  map <- leaflet(data = neighbourhood_map) %>%
+    addTiles(group = "OSM",
+             options = providerTileOptions(minZoom = 10, maxZoom = 26)) %>%
+    addPolygons(
+      stroke = TRUE,
+      weight = 2,
+      smoothFactor = 1,
+      fillOpacity = 0.7,
+      color = "white",
+      highlightOptions = highlightOptions(
+        color = "red",
+        weight = 4,
+        bringToFront = TRUE
+      ),
+      label = paste(locations$neighbourhood_name),
+      layerId = ~ Buurt_code
+    ) %>%
+    removeShape(layerId = selected_neighbourhood_corr_map) %>%
+    addPolygons(layerId = selected_neighbourhood_corr_map,
+                fillColor = "red",
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "white",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[which(locations$neighbourhood_code == selected_neighbourhood_corr_map), "neighbourhood_name"])
+    )
+  return(map)
+}
+
+
+update_correlation_map <- function(code) {
+  new_selected_neighbourhood_corr_map <- code
+  
+  leaflet_map_index_new <- as.numeric(match(new_selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  leaflet_map_index <- as.numeric(match(selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  
+  leafletProxy("mapSelectCorr") %>%
+    removeShape(layerId = selected_neighbourhood_corr_map) %>%
+    removeShape(layerId = new_selected_neighbourhood_corr_map) %>%
+    addPolygons(layerId = selected_neighbourhood_corr_map,
+                fillColor = "white",
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "white",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[locations$neighbourhood_code == new_selected_neighbourhood_corr_map, "neighbourhood_name"])
+    ) %>%
+    addPolygons(layerId = new_selected_neighbourhood_corr_map,
+                fillColor = "red",
+                data = neighbourhood_map[leaflet_map_index_new,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "grey",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[locations$neighbourhood_code == new_selected_neighbourhood_corr_map, "neighbourhood_name"])
+    )
+  
+  assign("selected_neighbourhood_corr_map", new_selected_neighbourhood_corr_map, envir = globalenv())
 }
 
 # Render the stat dropdown based on the selected theme

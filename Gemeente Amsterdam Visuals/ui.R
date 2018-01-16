@@ -128,9 +128,9 @@ ui <- dashboardPage(
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
-          "neighboorhoud_corr",
+          "neighbourhood_corr",
           "Kies een buurt:",
-          unique(sort(locations$neighbourhood_name)),
+          choices = unique(sort(locations$neighbourhood_name)),
           selected = "Osdorp Zuidoost"
         )
       ),
