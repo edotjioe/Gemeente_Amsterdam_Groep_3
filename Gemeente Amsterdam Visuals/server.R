@@ -31,7 +31,7 @@ server <- function(input, output, session) {
   }, output$stadsdeelchart2 <- render_graph2(input$themaC, input$stadsdeel1C, input$stadsdeel2C))
   
   # Table
-  output$datatable1 <- get_table(facts)
+  output$datatable1 <- get_facts_table()
   
   # Dashboard Buttons
   observeEvent(
