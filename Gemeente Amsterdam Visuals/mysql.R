@@ -9,6 +9,8 @@ connect_db <- function(){
             client.flag = CLIENT_MULTI_STATEMENTS)
 }
 
+
+
 get_query <- function(query) {
   con <- connect_db()
   

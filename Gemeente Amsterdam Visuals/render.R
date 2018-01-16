@@ -82,47 +82,43 @@ get_facts_table <- function() {
   return(DT::renderDataTable(df, filter = "top", options = list(pageLength = 50), colnames = colNames))
 }
 
-render_graph <- function(theme, city_district1, city_district2) {
+# Comparing districts per theme (line graph)
+render_graph <- function(theme, district_one, district_two) {
   plot <- renderPlotly({
-    # 1 - percentage
-    # 2 - absoluut
-    # 3 - rapportcijfer
-    # 4 - index
-    # 5 - gemiddelde
-    # 6 - per 1000
-    # 7 - 5-puntsschaal
-    # 8 - coefficient
     
-    statistics_id <- statistics %>%
+    theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-    
-    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
-    
+
+    factscompare <- facts %>%
+      filter(statistics_id == as.numeric(theme_id)) %>%
+      select(value, statistics_id, locations_id, year)
+
     chart_data <- factscompare %>% 
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id") %>%
       group_by(year, district_name) %>%
       summarise(value = sum(value))
     
-    stad1 <- chart_data %>%
-      filter(district_name == city_district1)
-    stad2 <- chart_data %>%
-      filter(district_name == city_district2)
+    district_data_one <- chart_data %>%
+      filter(district_name == district_one)
+    district_data_two <- chart_data %>%
+      filter(district_name == district_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        stad1$value, 
-                        stad2$value)
+                        district_data_one$value, 
+                        district_data_two$value)
     
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
+    return(plot_ly(final, x = final$unique.chart_data.year, y = final$district_data_one.value, name = district_data_one$district_name, type = 'scatter', mode = 'lines') %>%
+             add_trace(y = final$district_data_two.value, name = district_data_two$district_name, mode = 'lines') %>%
              config(displayModeBar = FALSE))
   })
   
   return(plot)
 }
 
-render_graph2 <- function(theme, city_district1, city_district2) {
+# Comparing neighbourhoods per theme (line graph)
+render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
   plot <- renderPlotly({
     # 1 - percentage
     # 2 - absoluut
@@ -133,43 +129,178 @@ render_graph2 <- function(theme, city_district1, city_district2) {
     # 7 - 5-puntsschaal
     # 8 - coefficient
     
-    statistics_id <- statistics %>%
+    theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-    
-    factscompare <- get_query(paste("SELECT value, statistics_id, locations_id, year FROM facts WHERE statistics_id = ", statistics_id, ";"))
+
+    factscompare <- facts %>%
+      filter(statistics_id == as.numeric(theme_id)) %>%
+      select(value, statistics_id, locations_id, year)
     
     chart_data <- factscompare %>% 
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id")
     
-    stad1 <- chart_data %>%
-      filter(neighbourhood_name == city_district1)
-    stad2 <- chart_data %>%
-      filter(neighbourhood_name == city_district2)
+    neighbourhood_data_one <- chart_data %>%
+      filter(neighbourhood_name == neighbourhood_one)
+    neighbourhood_data_two <- chart_data %>%
+      filter(neighbourhood_name == neighbourhood_two)
     
     final <- data.frame(unique(chart_data$year), 
-                        stad1$value, 
-                        stad2$value)
-    
-    return(plot_ly(final, x = final$unique.chart_data.year., y = final$stad1.value, name = city_district1, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$stad2.value, name = city_district2, mode = 'lines') %>%
-             config(displayModeBar = FALSE))
+                        neighbourhood_data_one$value, 
+                        neighbourhood_data_two$value)
+
+    return(
+      plot_ly(final, x = final$unique.chart_data.year, y = final$neighbourhood_data_one, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
+      add_trace(y = final$neighbourhood_data_two.value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
+      config(displayModeBar = FALSE))
   })
   
   return(plot)
 }
 
+render_graph3 <- function(statistic_one, statistic_two, location) {
+  plot <- renderPlotly({
+    statistic_id_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_id"]
+    statistic_id_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_id"]
+    
+    neighbourhood_id <- as.numeric(locations[locations$neighbourhood_name == location, "locations_id"])
+    
+    statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
+    
+    #s_one <- scale(as.matrix(statistic_one_df$value))
+    #s_two <- scale(as.matrix(statistic_two_df$value))
+
+    # Normalisatie deel
+    s_one <- (statistic_one_df$value-min(statistic_one_df$value))/(max(statistic_one_df$value)-min(statistic_one_df$value))
+    s_two <- (statistic_two_df$value-min(statistic_two_df$value))/(max(statistic_two_df$value)-min(statistic_two_df$value))
+    # print(s_one)
+    # print(s_two)
+
+    statistic_name_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_name"]
+    statistic_name_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_name"]
+
+    return(
+         plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_name_one, type = 'scatter', mode = 'lines') %>%
+         add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_name_two, mode = 'lines') %>%
+         layout(legend = list(orientation = 'h'), title = "Vergelijking lijngrafiek")
+       )
+  })
+  return(plot)
+}
+
+render_graph4 <- function(statistic_one, statistic_two, location) {
+  plot <- renderPlotly({
+    statistic_id_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_id"]
+    statistic_id_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_id"]
+    
+    neighbourhood_id <- as.numeric(locations[locations$neighbourhood_name == location, "locations_id"])
+    
+    statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
+    
+    min_index <- max(min(statistic_one_df$year), min(statistic_two_df$year))
+    max_index <- min(max(statistic_one_df$year), max(statistic_two_df$year))
+    
+    statistic_one_df <- statistic_one_df[statistic_one_df$year > min_index & statistic_one_df$year < max_index,]
+    statistic_two_df <- statistic_two_df[statistic_two_df$year > min_index & statistic_two_df$year < max_index,]
+    
+    statistic_name_one <- list(title = statistics[statistics$statistics_variable == statistic_one, "statistics_name"])
+    statistic_name_two <- list(title = statistics[statistics$statistics_variable == statistic_two, "statistics_name"])
+    
+    return(
+      plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, type = 'scatter') %>%
+      layout(xaxis = statistic_name_one, yaxis = statistic_name_two, title = "Correlatie grafiek")
+    )
+  })
+  return(plot)
+}
+
+# Initiate correlation map 
+correlation_map <- function() {
+  leaflet_map_index <- as.numeric(match(selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  
+  map <- leaflet(data = neighbourhood_map) %>%
+    addTiles(group = "OSM",
+             options = providerTileOptions(minZoom = 10, maxZoom = 26)) %>%
+    addPolygons(
+      stroke = TRUE,
+      weight = 2,
+      smoothFactor = 1,
+      fillOpacity = 0.7,
+      color = "white",
+      highlightOptions = highlightOptions(
+        color = "red",
+        weight = 4,
+        bringToFront = TRUE
+      ),
+      label = paste(locations$neighbourhood_name),
+      layerId = ~ Buurt_code
+    ) %>%
+    removeShape(layerId = selected_neighbourhood_corr_map) %>%
+    addPolygons(layerId = selected_neighbourhood_corr_map,
+                fillColor = "red",
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "white",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[which(locations$neighbourhood_code == selected_neighbourhood_corr_map), "neighbourhood_name"])
+    )
+  return(map)
+}
+
+
+update_correlation_map <- function(code) {
+  new_selected_neighbourhood_corr_map <- code
+  
+  leaflet_map_index_new <- as.numeric(match(new_selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  leaflet_map_index <- as.numeric(match(selected_neighbourhood_corr_map, locations$neighbourhood_code))
+  
+  leafletProxy("mapSelectCorr") %>%
+    removeShape(layerId = selected_neighbourhood_corr_map) %>%
+    removeShape(layerId = new_selected_neighbourhood_corr_map) %>%
+    addPolygons(layerId = selected_neighbourhood_corr_map,
+                fillColor = "white",
+                data = neighbourhood_map[leaflet_map_index,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "white",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[locations$neighbourhood_code == new_selected_neighbourhood_corr_map, "neighbourhood_name"])
+    ) %>%
+    addPolygons(layerId = new_selected_neighbourhood_corr_map,
+                fillColor = "red",
+                data = neighbourhood_map[leaflet_map_index_new,],
+                stroke = TRUE,
+                weight = 2,
+                smoothFactor = 1,
+                fillOpacity = 0.7,
+                color = "grey",
+                highlightOptions = highlightOptions(color = "red",
+                                                    weight = 4,
+                                                    bringToFront = TRUE),
+                label = paste(locations[locations$neighbourhood_code == new_selected_neighbourhood_corr_map, "neighbourhood_name"])
+    )
+  
+  assign("selected_neighbourhood_corr_map", new_selected_neighbourhood_corr_map, envir = globalenv())
+}
+
 # Render the stat dropdown based on the selected theme
-update_stat_select <- function(session, theme, theme_map_select) {
+update_stat_select <- function(session, theme, input_select) {
   updateSelectInput(session,
-                    "stat",
+                    input_select,
                     choices = split(statistics[statistics$theme_name == theme,]$statistics_variable,
                                     statistics[statistics$theme_name == theme,]$statistics_name))
-  updateSelectInput(session,
-                    "stat_map_select",
-                    choices = split(statistics[statistics$theme_name == theme_map_select,]$statistics_variable,
-                                    statistics[statistics$theme_name == theme_map_select,]$statistics_name))
 }
 
 # Map selection code

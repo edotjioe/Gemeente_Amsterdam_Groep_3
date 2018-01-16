@@ -20,6 +20,7 @@ ui <- dashboardPage(
         tabName = "map",
         icon = icon("map")
       ),
+      # Map Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
         condition = "input.sidebar == 'map'",
         class = "filter-panel",
@@ -35,14 +36,17 @@ ui <- dashboardPage(
         ),
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
       ),
+      # Menu ------------------------------------------------------------------------------------------------------------
       menuItem(
         "Grafieken",
         tabName = "chart",
         icon = icon("bar-chart-o"),
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
         menuSubItem("Vergelijk buurten", tabName = "chart"),
-        menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods")
+        menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
+        menuSubItem("Correlation", tabName = "Correlation")
       ),
+      # Compare district Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
         condition = "input.sidebar == 'stadsdeel'",
         class = "filter-panel",
@@ -63,6 +67,7 @@ ui <- dashboardPage(
           selected = "Zuid"
         )
       ),
+      # Compare neighbourhood Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
         condition = "input.sidebar == 'chart'",
         class = "filter-panel",
@@ -83,6 +88,7 @@ ui <- dashboardPage(
           selected = "Osdorp Zuidoost"
         )
       ),
+      # Compare neighbourhood by map Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
         condition = "input.sidebar == 'compare_neighbourhoods'",
         class = "filter-panel",
@@ -97,15 +103,48 @@ ui <- dashboardPage(
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
+      # Correlation Filter Panel ----------------------------------------------------------------------------------------------------
+      conditionalPanel(
+        condition = "input.sidebar == 'Correlation'",
+        class = "filter-panel",
+        selectInput(
+          "theme_corr_select_1",
+          "Select theme",
+          correlation_themes
+        ),
+        selectInput(
+          "stat_corr_select_1",
+          "Select statistic",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
+        ),
+        selectInput(
+          "theme_corr_select_2",
+          "Select theme",
+          correlation_themes
+        ),
+        selectInput(
+          "stat_corr_select_2",
+          "Select statistic",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
+        ),
+        selectInput(
+          "neighbourhood_corr",
+          "Kies een buurt:",
+          choices = unique(sort(locations$neighbourhood_name)),
+          selected = "Osdorp Zuidoost"
+        )
+      ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
       sidebarMenuOutput("dynamicsidebar")
     )
   ),
+  # Dashboard body -----------------------------------------------------------------------------------------------------------------
   dashboardBody(
     useShinyjs(),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "theme.css")
     ),
+    # Dashboard tab ----------------------------------------------------------------------------------------------------------------
     tabItems(
       tabItem(tabName = "dashboard",
         fluidPage(
@@ -162,22 +201,26 @@ ui <- dashboardPage(
           tags$style(type = 'text/css', ".selectize-dropdown-content {max-height: 150px; }")
         )
       ),
+      # Data explorer tab ---------------------------------------------------------------------------------------------------------
       tabItem(tabName = "datatable",
               h2("Data Explorer"),
               DT::dataTableOutput("datatable1")
       ),
+      # District tab ---------------------------------------------------------------------------------------------------------------
       tabItem(
         tabName = "stadsdeel",
         
         h2("Vergelijk stadsdelen op leefbaarheid:"),
         plotlyOutput("stadsdeelchart")
       ),
+      # Chart tab ---------------------------------------------------------------------------------------------------------------
       tabItem(
         tabName = "chart",
         
         h2("Vergelijk buurten op leefbaarheid:"),
         plotlyOutput("stadsdeelchart2")
       ),
+      # compare_neighbourhoods --------------------------------------------------------------------------------------------------
       tabItem(
         tabName = "compare_neighbourhoods",
         
@@ -195,6 +238,40 @@ ui <- dashboardPage(
             width = 6,
             
             plotlyOutput("map_graph")
+          )
+        )
+        
+      ),
+      # Correlation tab ------------------------------------------------------------------------------------------------------
+      tabItem(
+        tabName = "Correlation",
+        
+        h2("Correlation"),
+        fluidPage(
+          column(
+            5,
+            box(
+              id = "map_box",
+              width = 12,
+              title = "",
+              
+              leafletOutput("mapSelectCorr", width = "100%")
+            )
+          ),
+          column(
+            7,
+            box(
+              id = "corr_graph_box_1",
+              width = 12,
+              
+              plotlyOutput("corr_graph_1")
+            ),
+            box(
+              id = "corr_graph_box_2",
+              width = 12,
+              
+              plotlyOutput("corr_graph_2")
+            )
           )
         )
         

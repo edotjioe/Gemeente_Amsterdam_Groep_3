@@ -60,4 +60,8 @@ neighbourhood_map <- load_map_neighbourhood()
 pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
+selected_neighbourhood_corr_map <- "F81e"
 variableByTheme <- c()
+correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 
+                             "Verkeer", "Werk", "Inkomen", "Onderwijs", "Welzijn en zorg", 
+                             "Wonen", "Openbare ruimte"))
