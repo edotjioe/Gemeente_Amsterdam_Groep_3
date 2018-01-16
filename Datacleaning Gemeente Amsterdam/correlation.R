@@ -16,13 +16,14 @@ con <- dbConnect(RMySQL::MySQL(),
                  password = "ovv2atL4IgRBjd", 
                  client.flag = CLIENT_MULTI_STATEMENTS)
 
+# --- Get all the data needed to create the correlations ---
 statistics <- dbGetQuery(con, "SELECT * FROM statistics")
 facts <- dbGetQuery(con, "SELECT * FROM facts")
 locations <- dbGetQuery(con, "SELECT * from locations")
 
 dbDisconnect(con)
 
-# --- Create a data frame with all ---
+# --- Create the correlation data frame ---
 correlations <- data.frame(
   correlations_id = numeric(0),
   statistics_1_id = numeric(0),
@@ -30,90 +31,99 @@ correlations <- data.frame(
   district_code = character(0),
   value = numeric(0))
 
-stat_ids <- statistics$statistics_id
+temp_correlations <- data.frame(
+  correlations_id = numeric(0),
+  statistics_1_id = numeric(0),
+  statistics_2_id = numeric(0),
+  district_code = character(0),
+  value = numeric(0))
+# --- ---
+
+# --- Get all statistic ids where the statistic unit is a number
+stat_ids <- statistics[statistics$statistics_unit == 2,]$statistics_id
+# --- ---
+
+# --- Create fill the data frame for all statistic combinations (excluding 1-1, 2-2, 3-3, etc...)
 for(i in 1:length(stat_ids)) {
-  statistics_1_id <- rep(stat_ids[i], length(stat_ids) - 1)
-  statistics_2_id <- setdiff(stat_ids, stat_ids[i])
-  
-  df <- data.frame(
-    correlations_id = 0,
-    statistics_1_id = statistics_1_id,
-    statistics_2_id = statistics_2_id,
-    district_code = character(length(statistics_1_id)),
-    value = numeric(length(statistics_1_id)))
-  correlations <- rbind(correlations, df)
+  for(j in i:length(stat_ids)) {
+    if(i == j) {next}
+    
+    row <- data.frame(
+      correlations_id = numeric(1),
+      statistics_1_id = stat_ids[i],
+      statistics_2_id = stat_ids[j],
+      district_code = character(1),
+      value = numeric(1))
+    
+    temp_correlations <- rbind(temp_correlations, row)
+  }
 }
+# --- ---
+
+# --- Get all district codes ---
+district_codes <- unique(locations$district_code)
 # --- ---
 
 # --- Duplicate the earlier created data frame for every district ---
-location_ids <- unique(locations$district_code)
-copy <- correlations
-correlations <- correlations[!1:nrow(correlations),]
-for(i in 1:length(location_ids)) {
-  copy$district_code <- as.character(location_ids[i])
-  correlations <- rbind(correlations, copy)
+for(i in 1:length(district_codes)) {
+  temp_correlations$district_code <- district_codes[i]
+  
+  correlations <- rbind(correlations, temp_correlations)
 }
 # --- ---
 
-# Assign an id to each correlation
+# --- Assign an id to each correlation ---
 correlations$correlations_id <- 1:nrow(correlations)
+# --- ---
 
-for(i in 1:1000) { #nrow(correlations)
-  i <- 39
-  locations_id <- locations[locations$district_code == correlations[i,]$district_code,]$locations_id
-
-  if(!(correlations[i,]$statistics_1_id %in% facts$statistics_id) | !(correlations[i,]$statistics_1_id %in% facts$statistics_id)) {next}
+# --- Calculate the values for every row in correlations ---
+for(i in 514294:nrow(correlations)) {
+  # Get the location ids for the district code
+  location_ids <- locations[locations$district_code == correlations[i,]$district_code,]$locations_id
   
-  cor1 <- facts[facts$statistics_id == correlations[i,]$statistics_1_id,]
-  cor2 <- facts[facts$statistics_id == correlations[i,]$statistics_2_id,]
+  # Get the statistics for both correlations
+  cor_1_facts <- facts[facts$statistics_id == correlations[i,]$statistics_1_id & facts$locations_id == location_ids,]
+  cor_2_facts <- facts[facts$statistics_id == correlations[i,]$statistics_2_id & facts$locations_id == location_ids,]
   
-  cor1 <- cor1[locations_id %in% cor1$locations_id,]
-  cor2 <- cor2[locations_id %in% cor2$locations_id,]
-
-  if(nrow(cor1) > nrow(cor2)) {
-    cor1 <- cor1[cor2$locations_id %in% cor1$locations_id,]
-  } else if(nrow(cor1) < nrow(cor2)) {
-    cor2 <- cor2[cor1$locations_id %in% cor2$locations_id,]
+  # If there are no facts continue to the next cycle of the loop
+  if(nrow(cor_1_facts) == 0 | nrow(cor_2_facts) == 0) {next}
+  
+  # Keep the years that exist in both facts
+  cor_1_years <- unique(cor_1_facts$year)
+  cor_2_years <- unique(cor_2_facts$year)
+  
+  years <- Reduce(intersect, list(cor_1_years, cor_2_years))
+  
+  # If there are no matching years continue to the next cycle of the loop
+  if(length(years) == 0) {next}
+  
+  # Merge all neighbourhoods
+  cor_1_facts_sum <- data.frame(year = numeric(0), value = numeric(0))
+  for(j in 1:length(years)) {
+    year_values <- cor_1_facts[cor_1_facts$year == years[j],]$value
+    
+    cor_1_facts_sum <- rbind(cor_1_facts_sum, data.frame(year = years[j], value = sum(year_values)))
   }
   
-  if(nrow(cor1) == 0 | nrow(cor2) == 0) {next}
-  
-  cor1 %>%
-    arrange(desc(year))
-  
-  cor2 %>%
-    arrange(desc(year))
-
-  if(nrow(cor1) > nrow(cor2)) {
-    cor1 <- cor1[cor2$year %in% cor1$year,]
-  } else if(nrow(cor1) < nrow(cor2)) {
-    cor2 <- cor2[cor1$year %in% cor2$year,]
+  cor_2_facts_sum <- data.frame(year = numeric(0), value = numeric(0))
+  for(j in 1:length(years)) {
+    year_values <- cor_2_facts[cor_2_facts$year == years[j],]$value
+    
+    cor_2_facts_sum <- rbind(cor_2_facts_sum, data.frame(year = years[j], value = sum(year_values)))
   }
   
-  print(cor(x = cor1$value, y = cor2$value))
-  correlations[i, "value"] <- cor(x = cor1$value, y = cor2$value)
+  # Sort the data frames by year
+  cor_1_facts_sum <- cor_1_facts_sum[order(cor_1_facts_sum$year),]
+  cor_2_facts_sum <- cor_2_facts_sum[order(cor_2_facts_sum$year),]
+  
+  # Calculate and insert correlations
+  correlations[i,]$value <- cor(x = cor_1_facts_sum$value, y = cor_2_facts_sum$value)
 }
 
+correlations <- correlations[!is.na(correlations$value),]
 
-# Old code
-corr_ma <- matrix(ncol = length(statistics$statistics_id), nrow = length(statistics$statistics_id))
+dbWriteTable(con, "correlations", correlations, overwrite = TRUE)
 
-f1 <- facts %>% 
-  filter(locations_id == 164) %>% 
-  arrange(desc(year))
-
-for (i in 1:nrow(statistics)) {
-  df1 <- f1[which(statistics[i,"statistics_id"] == f1$statistics_id), "value"]
-  for (j in 1:nrow(statistics)) {
-    df2 <- f1[which(statistics[j,"statistics_id"] == f1$statistics_id), "value"]
-    if(length(df1) ==  length(df2)) {
-      corr_ma[i,j] <- cor(x = df1, y = df2)
-    }
-  }
-}
-
-# cor(c(1,2,3,4), c(1,2,3,4))
-# f1[f1$statistics_id == 104, "value"]
-# df1 <- statistics[match(statistics[1,"statistics_id"], f1$statistics_id, nomatch = 0), "value"]
-# df2 <- statistics[match(statistics[4,"statistics_id"], f1$statistics_id, nomatch = 0), "value"]
-# cor(x = df1$value, y = df2$value)
+# i = 514294 <- start there in the above for loop
+saveRDS(correlations, "intermediate.RDS")
+correlations <- readRDS("intermediate.RDS")
