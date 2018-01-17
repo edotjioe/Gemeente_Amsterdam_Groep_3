@@ -26,15 +26,15 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme",
-          "Select theme",
+          "Kies een thema:",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
-        sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
+        sliderInput("year", "Kies een jaar:", 2005, 2017, 2017, step = 1, sep = "")
       ),
       # Menu ------------------------------------------------------------------------------------------------------------
       menuItem(
@@ -44,7 +44,7 @@ ui <- dashboardPage(
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
         menuSubItem("Vergelijk buurten", tabName = "chart"),
         menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
-        menuSubItem("Correlation", tabName = "Correlation")
+        menuSubItem("Correlatie", tabName = "Correlation")
       ),
       # Compare district Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
@@ -94,12 +94,12 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_map_select",
-          "Selecteer thema",
+          "Kies een thema:",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat_map_select",
-          "Selecteer statistiek",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
@@ -109,22 +109,22 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_corr_select_1",
-          "Select theme",
+          "Kies een thema:",
           correlation_themes
         ),
         selectInput(
           "stat_corr_select_1",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
           "theme_corr_select_2",
-          "Select theme",
+          "Kies een thema:",
           correlation_themes
         ),
         selectInput(
           "stat_corr_select_2",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
@@ -246,7 +246,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "Correlation",
         
-        h2("Correlation"),
+        h2("Correlatie"),
         fluidPage(
           column(
             5,
