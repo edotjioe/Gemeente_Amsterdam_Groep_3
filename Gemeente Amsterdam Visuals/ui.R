@@ -129,9 +129,9 @@ ui <- dashboardPage(
         ),
         selectInput(
           "neighbourhood_corr",
-          "Kies een buurt:",
-          choices = unique(sort(locations$neighbourhood_name)),
-          selected = "Osdorp Zuidoost"
+          "Kies een stadsdeel:",
+          choices = split(district_map$Stadsdeel_code, district_map$Stadsdeel),
+          selected = "Centrum"
         )
       ),
       menuItem("Data explorer", tabName = "datatable", icon = icon("table")),
@@ -239,8 +239,13 @@ ui <- dashboardPage(
             
             plotlyOutput("map_graph")
           )
+        ),
+        fluidRow(
+          box(
+            id = "datatable_box",
+            DT::dataTableOutput("datatable_compare_by_map")
+          )
         )
-        
       ),
       # Correlation tab ------------------------------------------------------------------------------------------------------
       tabItem(

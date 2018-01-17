@@ -30,6 +30,10 @@ load_map_neighbourhood <- function() {
   return(geojsonio::geojson_read("datafiles/GEBIED_BUURTEN.json", what = "sp", stringsAsFactor = FALSE))
 }
 
+load_map_districts <- function() {
+  return(geojsonio::geojson_read("datafiles/GEBIED_STADSDELEN.json", what = "sp", stringsAsFactor = FALSE))
+}
+
 load_facts <- function() {
   print("Loading facts...")
   
@@ -119,12 +123,18 @@ statistics <- load_statistics()
 facts <- load_facts()
 correlations <- load_correlations()
 neighbourhood_map <- load_map_neighbourhood()
+district_map <- load_map_districts()
 pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
+<<<<<<< Updated upstream
 facts_merged <- create_merge_facts()
 corr_table <- create_corr_table()
 selected_neighbourhood_corr_map <- "F81e"
+=======
+#facts_merged <- create_merge_facts()
+selected_district_corr_map <- "A"
+>>>>>>> Stashed changes
 variableByTheme <- c()
 correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 
                              "Verkeer", "Werk", "Inkomen", "Onderwijs", "Welzijn en zorg", 
