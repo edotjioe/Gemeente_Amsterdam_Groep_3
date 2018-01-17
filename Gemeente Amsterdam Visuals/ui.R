@@ -115,7 +115,7 @@ ui <- dashboardPage(
       ),
       # Correlation Filter Panel ----------------------------------------------------------------------------------------------------
       conditionalPanel(
-        condition = "input.sidebar == 'Correlation'",
+        condition = "input.sidebar == 'correlation'",
         class = "filter-panel",
         selectInput(
           "theme_corr_select_1",
