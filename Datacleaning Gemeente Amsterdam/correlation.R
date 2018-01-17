@@ -77,7 +77,7 @@ correlations$correlations_id <- 1:nrow(correlations)
 # --- ---
 
 # --- Calculate the values for every row in correlations ---
-for(i in 514294:nrow(correlations)) {
+for(i in 1:nrow(correlations)) {
   # Get the location ids for the district code
   location_ids <- locations[locations$district_code == correlations[i,]$district_code,]$locations_id
   

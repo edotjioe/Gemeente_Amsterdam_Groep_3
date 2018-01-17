@@ -266,6 +266,12 @@ ui <- dashboardPage(
           column(
             6,
             box(
+              id = "corr_message_box",
+              width = 12,
+              
+              h4(textOutput("corr_message"))
+            ),
+            box(
               id = "corr_graph_box_1",
               width = 12,
               

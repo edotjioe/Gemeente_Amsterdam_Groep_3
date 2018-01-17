@@ -58,6 +58,7 @@ server <- function(input, output, session) {
   }, {
     output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
     output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
+    output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
   })
   
   
