@@ -105,7 +105,7 @@ create_corr_table <- function() {
   df <- data.frame(df[df$value > 0.7 | df$value < -0.7,])
   df <- data.table(filter(df, df$statistics_1_id %in% statistics_list$statistics_id & df$statistics_2_id %in% statistics_list$statistics_id))
   
-  df$value <- formatC(abs(df$value * 100000) / 1000, digits = 3)
+  df$value <- formatC(abs(df$value * 100000) / 1000, digits = 5)
   df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name", "theme_name")]), by.x = "statistics_1_id", by.y = "statistics_id", allow.cartesian = TRUE)
   df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name", "theme_name")]), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
   df <- merge(df, data.table(district_locations), by = "district_code", allow.cartesian = TRUE)

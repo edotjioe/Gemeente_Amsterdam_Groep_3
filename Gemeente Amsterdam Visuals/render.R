@@ -392,21 +392,20 @@ render_select_map_plot <- function(stat) {
   return(renderPlotly(plot))
 }
 
-get_corr_message <- function(stat1, stat2, neighbourhood) {
+get_corr_message <- function(stat1, stat2, distric_code) {
   if(stat1 == stat2) {
     return(renderText("Selecteer twee verschillende statestieken om te vergelijken"))
   }
-  print(stat1)
-  print(stat2)
+
   stat1_row <- statistics[statistics$statistics_variable == stat1,]
   stat2_row <- statistics[statistics$statistics_variable == stat2,]
-  print(stat1_row)
-  print(stat2_row)
-  corr <- correlations[
-    (correlations$statistics_1_id == stat1_row$statistics_id & correlations$statistics_2_id == stat2_row$statistics_id)
+
+  corr <- correlations[correlations$district_code == distric_code,]
+  corr <- corr[
+    (corr$statistics_1_id == stat1_row$statistics_id & corr$statistics_2_id == stat2_row$statistics_id)
     |
-    (correlations$statistics_1_id == stat2_row$statistics_id & correlations$statistics_2_id == stat1_row$statistics_id),]
-  print(corr)
+    (corr$statistics_1_id == stat2_row$statistics_id & corr$statistics_2_id == stat1_row$statistics_id),]
+
   if(nrow(corr) == 0) {
     return(renderText(paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))
   }
