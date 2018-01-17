@@ -51,6 +51,21 @@ create_various_variables <- function() {
   return(as.numeric(leaflet_map_index <- 1))
 }
 
+create_merge_facts <- function() {
+  df <- facts
+  
+  df <- merge(df, locations, by = "locations_id")
+  df <- merge(df, statistics, by = "statistics_id")
+  units <- data.frame("unit_id" = c(1, 2, 3, 4, 5, 6, 7, 8), "unit_name" = c("%", "Absoluut", "Rapport", "Index", "Gemiddelde", "Per 1000", "5-puntsschaal", "Coefficient"))
+  df <- merge(df, units, by.x = "statistics_unit", by.y = "unit_id")
+  
+  selectedCols <- c("statistics_name", "neighbourhood_name", "year", "value", "unit_name")
+  
+  df <- df[, selectedCols]
+  
+  return(df)
+}
+
 # Create environment variables
 print("Running init.R")
 locations <- load_locations()
@@ -60,4 +75,9 @@ neighbourhood_map <- load_map_neighbourhood()
 pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
+facts_merged <- create_merge_facts()
+selected_neighbourhood_corr_map <- "F81e"
 variableByTheme <- c()
+correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 
+                             "Verkeer", "Werk", "Inkomen", "Onderwijs", "Welzijn en zorg", 
+                             "Wonen", "Openbare ruimte"))
