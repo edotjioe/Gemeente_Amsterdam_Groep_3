@@ -1,4 +1,4 @@
-# install all libraries here!
+# install all packages here!
 # install.packages("shiny")
 # install.packages("shinydashboard")
 # install.packages("ggplot2")

@@ -36,10 +36,8 @@ render_map <- function(year, stat) {
 
 colorPicker <- function(neighbourhood_code) {
   colors <- data.frame(code = neighbourhood_code)
-  colors$color <- "grey"
-  
-  colors[which(colors$code == selected_locations), "color"] = "blue"
-  
+  colors$color <- "white"
+  colors[which(colors$code == selected_locations), "color"] = "red"
   return(colors$color)
 }
 
@@ -95,12 +93,11 @@ render_graph <- function(theme, district_one, district_two) {
     district_data_two <- chart_data %>%
       filter(district_name == district_two)
     
-    final <- data.frame(unique(chart_data$year), 
-                        district_data_one$value, 
-                        district_data_two$value)
+    print(district_data_one$year)
+    print(district_data_two$year)
     
-    return(plot_ly(final, x = final$unique.chart_data.year, y = final$district_data_one.value, name = district_data_one$district_name, type = 'scatter', mode = 'lines') %>%
-             add_trace(y = final$district_data_two.value, name = district_data_two$district_name, mode = 'lines') %>%
+    return(plot_ly(x = district_data_one$year, y = district_data_one$value, name = district_data_one$district_name, type = 'scatter', mode = 'lines', nticks = 1) %>%
+             add_trace(x = district_data_two$year, y = district_data_two$value, name = district_data_two$district_name, mode = 'lines') %>%
              config(displayModeBar = FALSE))
   })
   
@@ -128,13 +125,9 @@ render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
     neighbourhood_data_two <- chart_data %>%
       filter(neighbourhood_name == neighbourhood_two)
     
-    final <- data.frame(unique(chart_data$year), 
-                        neighbourhood_data_one$value, 
-                        neighbourhood_data_two$value)
-    
     return(
-      plot_ly(final, x = final$unique.chart_data.year, y = final$neighbourhood_data_one, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
-      add_trace(y = final$neighbourhood_data_two.value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
+      plot_ly(x = neighbourhood_data_one$year, y = neighbourhood_data_one$value, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
+      add_trace(x = neighbourhood_data_two$year, y = neighbourhood_data_two$value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
       config(displayModeBar = FALSE))
   })
   
@@ -166,10 +159,6 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
         value = sum(value)
       ) %>%
       as.data.frame()
-
-    # Normalisatie deel
-    # s_one <- (statistic_one_df$value-min(statistic_one_df$value))/(max(statistic_one_df$value)-min(statistic_one_df$value))
-    # s_two <- (statistic_two_df$value-min(statistic_two_df$value))/(max(statistic_two_df$value)-min(statistic_two_df$value))
 
     statistic_name_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_name"]
     statistic_name_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_name"]
@@ -209,10 +198,6 @@ render_graph4 <- function(statistic_one, statistic_two, location) {
         value = sum(value)
       ) %>%
       as.data.frame()
-    
-    # Sort the data frames by year
-    # cor_1_facts_sum <- cor_1_facts_sum[order(cor_1_facts_sum$year),]
-    # cor_2_facts_sum <- cor_2_facts_sum[order(cor_2_facts_sum$year),]
     
     min_index <- max(min(statistic_one_df$year), min(statistic_two_df$year))
     max_index <- min(max(statistic_one_df$year), max(statistic_two_df$year))
@@ -340,9 +325,9 @@ update_seleted_polys <- function(id) {
   location_poly <- locations[leaflet_map_index,]
   
   if(id %in% selected_locations) {
-    color <- "blue"
+    color <- "red"
   } else {
-    color <- "grey"
+    color <- "white"
   }
   
   leafletProxy("mapSelectMulti") %>%
@@ -354,7 +339,7 @@ update_seleted_polys <- function(id) {
                 weight = 2,
                 smoothFactor = 1,
                 fillOpacity = 0.7,
-                color = "grey",
+                color = "white",
                 highlightOptions = highlightOptions(color = "red",
                                                     weight = 4,
                                                     bringToFront = TRUE),
@@ -392,7 +377,7 @@ render_select_map_plot <- function(stat) {
   return(renderPlotly(plot))
 }
 
-get_corr_message <- function(stat1, stat2, distric_code) {
+get_corr_message <- function(stat1, stat2, district_code) {
   if(stat1 == stat2) {
     return(renderText("Selecteer twee verschillende statestieken om te vergelijken"))
   }
@@ -400,19 +385,21 @@ get_corr_message <- function(stat1, stat2, distric_code) {
   stat1_row <- statistics[statistics$statistics_variable == stat1,]
   stat2_row <- statistics[statistics$statistics_variable == stat2,]
 
-  corr <- correlations[correlations$district_code == distric_code,]
-  corr <- corr[
-    (corr$statistics_1_id == stat1_row$statistics_id & corr$statistics_2_id == stat2_row$statistics_id)
-    |
-    (corr$statistics_1_id == stat2_row$statistics_id & corr$statistics_2_id == stat1_row$statistics_id),]
+  
+  corr <- correlations[which(correlations$statistics_1_id == stat1_row$statistics_id & 
+                               correlations$statistics_2_id == stat2_row$statistics_id &
+                               correlations$district_code == district_code),] 
 
   if(nrow(corr) == 0) {
-    return(renderText(paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))
+    return(renderText(
+      paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))
   }
   
   if(corr$value >= 0.8) {
-    return(renderText(paste(stat1_row$statistics_name, "en", stat2_row$statistics_name, "hebben een verband met elkaar")))
+    return(renderText(
+      paste(stat1_row$statistics_name, "en", stat2_row$statistics_name, "hebben een verband met elkaar")))
   } else {
-    return(renderText(paste("Er is geen verband tussen", stat1_row$statistics_name, "en", stat2_row$statistics_name)))
+    return(renderText(
+      paste("Er is geen verband tussen", stat1_row$statistics_name, "en", stat2_row$statistics_name)))
   }
 }

@@ -1,6 +1,6 @@
 server <- function(input, output, session) {       
   # Combine the selected variables into a new data frame
-  map <- reactive(render_map(input$year, input$stat))
+  map <- reactive(render_map(input$year, input$stat_map_select))
   output$map <- renderLeaflet(map())
   output$mapSelectCorr <- renderLeaflet(correlation_map())
   output$mapSelectMulti <- renderLeaflet(render_select_map())
@@ -8,7 +8,7 @@ server <- function(input, output, session) {
   # ObserveEvent for updating the variable list at "Interactieve map" page
   observeEvent({
     input$theme_map_select
-  }, update_stat_select(session, input$theme, "stat"))
+  }, update_stat_select(session, input$theme_map_select, "stat_map_select"))
   
   # ObserveEvent for updating the map at "Vergelijk buurten met kaart" page
   observeEvent({
@@ -51,7 +51,7 @@ server <- function(input, output, session) {
     output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
   })
 
-  # OberveEvent for updating the map, selectInput and graphs at "Correlatie" page   by selectInput "mapSelectCorr_shape_click"
+  # OberveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "mapSelectCorr_shape_click"
   observeEvent({
     input$mapSelectCorr_shape_click
   }, {
@@ -71,24 +71,29 @@ server <- function(input, output, session) {
     output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
   })
   
-  # # ObserveEvent for updating variable list by theme at "Correlatie" page
-  # observeEvent({
-  #   input$theme_corr_select_2
-  # }, update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2"))
-  
   # ObserveEvent for updating the graph at "Vergelijk stadsdeel" page
   observeEvent({
-    input$thema
-    input$stadsdeel1
-    input$stadsdeel2
-  }, output$stadsdeelchart <- render_graph(input$thema, input$stadsdeel1, input$stadsdeel2))
+    input$statistic_compare_district
+    input$district_compare_one
+    input$district_compare_two
+  }, output$district_chart <- render_graph(input$statistic_compare_district, input$district_compare_one, input$district_compare_two))
   
-  # ObserveEvent for updating the graph at "Vergelijk buurten" page
+  # ObserveEvent for updating the select at "Vergelijk stadsdeel" page with theme 
   observeEvent({
-    input$themaC
-    input$stadsdeel1C
-    input$stadsdeel2C
-  }, output$stadsdeelchart2 <- render_graph2(input$themaC, input$stadsdeel1C, input$stadsdeel2C))
+    input$theme_compare_district
+  }, update_stat_select_quantitative(session, input$theme_compare_district, "statistic_compare_district"))
+  
+  # ObserveEvent for updating the graph at "Vergelijk buurten" page  
+  observeEvent({
+    input$statistic_compare_neighbourhood
+    input$neighbourhood_compare_one
+    input$neighbourhood_compare_two
+  }, output$neighbourhood_chart <- render_graph2(input$statistic_compare_neighbourhood, input$neighbourhood_compare_one, input$neighbourhood_compare_two))
+  
+  # ObserveEvent for updating the select at "Vergelijk buurten" page with theme 
+  observeEvent({
+    input$theme_compare_neighbourhood
+  }, update_stat_select(session, input$theme_compare_neighbourhood, "statistic_compare_neighbourhood"))
   
   # Dashboard Buttons redirecting to different pages
   observeEvent(
@@ -102,6 +107,6 @@ server <- function(input, output, session) {
   )
   
   # Table
-  output$datatable1 <- facts_merged
+  output$datatable <- facts_merged
   output$corr_table_data <- corr_table
 }

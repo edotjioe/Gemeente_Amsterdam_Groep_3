@@ -25,12 +25,12 @@ ui <- dashboardPage(
         condition = "input.sidebar == 'map'",
         class = "filter-panel",
         selectInput(
-          "theme",
+          "theme_map_select",
           "Kies een thema:",
           unique(statistics$theme_name)
         ),
         selectInput(
-          "stat",
+          "stat_map_select",
           "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
@@ -41,27 +41,32 @@ ui <- dashboardPage(
         "Grafieken",
         tabName = "chart",
         icon = icon("bar-chart-o"),
-        menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
-        menuSubItem("Vergelijk buurten", tabName = "chart"),
+        menuSubItem("Vergelijk stadsdeel", tabName = "district"),
+        menuSubItem("Vergelijk buurten", tabName = "neighbourhood"),
         menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
-        menuSubItem("Correlatie", tabName = "Correlation")
+        menuSubItem("Correlatie tussen stadsdelen", tabName = "correlation")
       ),
       # Compare district Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
-        condition = "input.sidebar == 'stadsdeel'",
+        condition = "input.sidebar == 'district'",
         class = "filter-panel",
         selectInput(
-          "thema",
+          "theme_compare_district",
           "Kies een thema:",
-          split(statistics[which(statistics$statistics_unit == 2), "statistics_variable"], statistics[which(statistics$statistics_unit == 2), "statistics_name"])
+          unique(statistics$theme_name)
         ),
         selectInput(
-          "stadsdeel1",
+          "statistic_compare_district",
+          "Kies een statistiek:",
+          choices = c("Bevolking totaal" = "BEVTOTAAL")
+        ),
+        selectInput(
+          "district_compare_one",
           "Kies een stadsdeel:",
           unique(sort(locations$district_name))
         ),
         selectInput(
-          "stadsdeel2",
+          "district_compare_two",
           "Kies een stadsdeel:",
           unique(sort(locations$district_name)),
           selected = "Zuid"
@@ -69,20 +74,25 @@ ui <- dashboardPage(
       ),
       # Compare neighbourhood Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
-        condition = "input.sidebar == 'chart'",
+        condition = "input.sidebar == 'neighbourhood'",
         class = "filter-panel",
         selectInput(
-          "themaC",
+          "theme_compare_neighbourhood",
           "Kies een thema:",
+          unique(statistics$theme_name)
+        ),
+        selectInput(
+          "statistic_compare_neighbourhood",
+          "Kies een statistiek:",
           split(statistics[which(statistics$statistics_unit == 2), "statistics_variable"], statistics[which(statistics$statistics_unit == 2), "statistics_name"])
         ),
         selectInput(
-          "stadsdeel1C",
+          "neighbourhood_compare_one",
           "Kies een buurt:",
           unique(sort(locations$neighbourhood_name))
         ),
         selectInput(
-          "stadsdeel2C",
+          "neighbourhood_compare_two",
           "Kies een buurt:",
           unique(sort(locations$neighbourhood_name)),
           selected = "Osdorp Zuidoost"
@@ -204,27 +214,27 @@ ui <- dashboardPage(
       # Data explorer tab ---------------------------------------------------------------------------------------------------------
       tabItem(tabName = "datatable",
               h2("Data Explorer"),
-              DT::dataTableOutput("datatable1")
+              DT::dataTableOutput("datatable")
       ),
       # District tab ---------------------------------------------------------------------------------------------------------------
       tabItem(
-        tabName = "stadsdeel",
+        tabName = "district",
         
-        h2("Vergelijk stadsdelen op leefbaarheid:"),
-        plotlyOutput("stadsdeelchart")
+        h2("Vergelijk stadsdelen:"),
+        plotlyOutput("district_chart")
       ),
       # Chart tab ---------------------------------------------------------------------------------------------------------------
       tabItem(
-        tabName = "chart",
+        tabName = "neighbourhood",
         
-        h2("Vergelijk buurten op leefbaarheid:"),
-        plotlyOutput("stadsdeelchart2")
+        h2("Vergelijk buurten:"),
+        plotlyOutput("neighbourhood_chart")
       ),
-      # compare_neighbourhoods --------------------------------------------------------------------------------------------------
+      # Compare_neighbourhoods --------------------------------------------------------------------------------------------------
       tabItem(
         tabName = "compare_neighbourhoods",
         
-        h2("Vergelijk buurten"),
+        h2("Vergelijk buurten op kaart"),
         fluidRow(
           box(
             id = "map_box",
@@ -239,19 +249,13 @@ ui <- dashboardPage(
             
             plotlyOutput("map_graph")
           )
-        ),
-        fluidRow(
-          box(
-            id = "datatable_box",
-            DT::dataTableOutput("datatable_compare_by_map")
-          )
         )
       ),
       # Correlation tab ------------------------------------------------------------------------------------------------------
       tabItem(
-        tabName = "Correlation",
+        tabName = "correlation",
         
-        h2("Correlatie"),
+        h2("Correlatie tussen stadsdelen"),
         fluidPage(
           column(
             6,
