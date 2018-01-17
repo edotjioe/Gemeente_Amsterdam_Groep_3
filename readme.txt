@@ -1,0 +1,1 @@
+This project is to visualise open data from gemeente Amsterdam with use of R.
