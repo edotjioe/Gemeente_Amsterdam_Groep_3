@@ -92,7 +92,7 @@ create_merge_facts <- function() {
   return(DT::renderDataTable(df,
                              filter = "top",
                              options = list(pageLength = 50),
-                             colnames = c("Statestiek", "Buurt", "Jaar", "Waarde", "Eenheid")))
+                             colnames = c("Statistiek", "Buurt", "Jaar", "Waarde", "Eenheid")))
 }
 
 create_corr_table <- function() {
@@ -119,7 +119,7 @@ create_corr_table <- function() {
   return(DT::renderDataTable(df,
                              filter = "top",
                              options = list(pageLength = 6),
-                             colnames = c("Stadsdeel", "Statestiek 1", "Statestiek 2", "Verband in %")))
+                             colnames = c("Stadsdeel", "Statistiek 1", "Statistiek 2", "Verband in %")))
 }
 
 # Create environment variables
