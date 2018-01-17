@@ -105,6 +105,8 @@ create_corr_table <- function() {
   df <- merge(df, data.table(statistics), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
   df <- merge(df, data.table(locations), by = "district_code", allow.cartesian = TRUE)
 
+  df <- df[1:1000,]
+  
   df <- data.frame(df)
   
   selected_cols <- c("district_name", "statistics_name.x", "statistics_name.y", "value")
@@ -128,7 +130,7 @@ pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
 corr_table <- create_corr_table()
-#facts_merged <- create_merge_facts()
+facts_merged <- create_merge_facts()
 selected_district_corr_map <- "A"
 variableByTheme <- c()
 correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 

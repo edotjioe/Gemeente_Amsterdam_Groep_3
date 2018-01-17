@@ -167,13 +167,6 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
       ) %>%
       as.data.frame()
 
-    print(neighbourhood_ids)
-    str(statistic_one_df)
-    print(statistic_two_df)
-    
-    # statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
-    # statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
-
     # Normalisatie deel
     # s_one <- (statistic_one_df$value-min(statistic_one_df$value))/(max(statistic_one_df$value)-min(statistic_one_df$value))
     # s_two <- (statistic_two_df$value-min(statistic_two_df$value))/(max(statistic_two_df$value)-min(statistic_two_df$value))
@@ -193,17 +186,33 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
 render_graph4 <- function(statistic_one, statistic_two, location) {
   plot <- renderPlotly({
     
-    # Sort the data frames by year
-    cor_1_facts_sum <- cor_1_facts_sum[order(cor_1_facts_sum$year),]
-    cor_2_facts_sum <- cor_2_facts_sum[order(cor_2_facts_sum$year),]
-    
     statistic_id_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_id"]
     statistic_id_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_id"]
     
-    neighbourhood_id <- as.numeric(locations[locations$neighbourhood_name == location, "locations_id"])
+    neighbourhood_ids <- locations[locations$district_code == location, "locations_id"] %>%
+      as.data.frame()
     
-    statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
-    statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
+    statistic_one_df <- facts %>%
+      filter(statistics_id == statistic_id_one) %>%
+      filter(locations_id %in% neighbourhood_ids$locations_id) %>%
+      group_by(year) %>%
+      summarise(
+        value = sum(value)
+      ) %>%
+      as.data.frame()
+    
+    statistic_two_df <- facts %>%
+      filter(statistics_id == statistic_id_two) %>%
+      filter(locations_id %in% neighbourhood_ids$locations_id) %>%
+      group_by(year) %>%
+      summarise(
+        value = sum(value)
+      ) %>%
+      as.data.frame()
+    
+    # Sort the data frames by year
+    # cor_1_facts_sum <- cor_1_facts_sum[order(cor_1_facts_sum$year),]
+    # cor_2_facts_sum <- cor_2_facts_sum[order(cor_2_facts_sum$year),]
     
     min_index <- max(min(statistic_one_df$year), min(statistic_two_df$year))
     max_index <- min(max(statistic_one_df$year), max(statistic_two_df$year))
