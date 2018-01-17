@@ -77,9 +77,6 @@ server <- function(input, output, session) {
     input$stadsdeel2C
   }, output$stadsdeelchart2 <- render_graph2(input$themaC, input$stadsdeel1C, input$stadsdeel2C))
   
-  # Tables
-  output$datatable1 <- get_facts_table()
-  
   # Dashboard Buttons
   observeEvent(
     input$button_map, {
@@ -96,4 +93,8 @@ server <- function(input, output, session) {
       updateTabItems(session, "sidebar", selected = "datatable")
     }
   )
+  
+  # Table
+  output$datatable1 <- facts_merged
+  output$corr_table_data <- corr_table
 }
