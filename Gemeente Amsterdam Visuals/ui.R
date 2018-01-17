@@ -44,7 +44,7 @@ ui <- dashboardPage(
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
         menuSubItem("Vergelijk buurten", tabName = "chart"),
         menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
-        menuSubItem("Correlation", tabName = "Correlation")
+        menuSubItem("Correlation", tabName = "Correlatie")
       ),
       # Compare district Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
@@ -109,22 +109,22 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_corr_select_1",
-          "Select theme",
+          "Kies een thema:",
           correlation_themes
         ),
         selectInput(
           "stat_corr_select_1",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
           "theme_corr_select_2",
-          "Select theme",
+          "Kies een thema:",
           correlation_themes
         ),
         selectInput(
           "stat_corr_select_2",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
