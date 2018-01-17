@@ -408,7 +408,7 @@ get_corr_message <- function(stat1, stat2, neighbourhood) {
     (correlations$statistics_1_id == stat2_row$statistics_id & correlations$statistics_2_id == stat1_row$statistics_id),]
   print(corr)
   if(nrow(corr) == 0) {
-    return(renderText(paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berkend worden")))
+    return(renderText(paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))
   }
   
   if(corr$value >= 0.8) {

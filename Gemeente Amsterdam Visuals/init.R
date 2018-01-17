@@ -98,14 +98,15 @@ create_merge_facts <- function() {
 create_corr_table <- function() {
   print("Merging correlations, statistics and locations...")
   
-  df <- data.table(correlations[!correlations$value == 1 | !correlations$value == -1,])
+  district_locations <- data.frame(district_code = unique(locations$district_code), district_name = unique(locations$district_name))
   
-  df$value <- round(abs(df$value * 100000) / 1000, digits = 3)
-  df <- merge(df, data.table(statistics), by.x = "statistics_1_id", by.y = "statistics_id", allow.cartesian = TRUE)
-  df <- merge(df, data.table(statistics), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
-  df <- merge(df, data.table(locations), by = "district_code", allow.cartesian = TRUE)
-
-  df <- df[1:1000,]
+  df <- data.frame(correlations[correlations$value > 0.8 | correlations$value < -0.8,])
+  df <- data.table(df[df$value < 1 & df$value > -1,])
+  
+  df$value <- formatC(abs(df$value * 100000) / 1000, digits = 3)
+  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name")]), by.x = "statistics_1_id", by.y = "statistics_id", allow.cartesian = TRUE)
+  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name")]), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
+  df <- merge(df, data.table(district_locations), by = "district_code", allow.cartesian = TRUE)
   
   df <- data.frame(df)
   
