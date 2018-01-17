@@ -34,8 +34,8 @@ server <- function(input, output, session) {
     input$theme_corr_select_2
   }, 
   {
-    update_stat_select(session, input$theme_corr_select_1, "stat_corr_select_1")
-    update_stat_select(session, input$theme_corr_select_2, "stat_corr_select_2")
+    update_stat_select_quantitative(session, input$theme_corr_select_1, "stat_corr_select_1")
+    update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2")
   })
   
   # ObserveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "neighbourhood_corr"
@@ -71,10 +71,10 @@ server <- function(input, output, session) {
     output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
   })
   
-  # ObserveEvent for updating variable list by theme at "Correlatie" page
-  observeEvent({
-    input$theme_corr_select_2
-  }, update_stat_select(session, input$theme_corr_select_2, "stat_corr_select_2"))
+  # # ObserveEvent for updating variable list by theme at "Correlatie" page
+  # observeEvent({
+  #   input$theme_corr_select_2
+  # }, update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2"))
   
   # ObserveEvent for updating the graph at "Vergelijk stadsdeel" page
   observeEvent({

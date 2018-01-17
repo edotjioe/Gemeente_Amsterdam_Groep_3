@@ -317,6 +317,13 @@ update_stat_select <- function(session, theme, input_select) {
                                     statistics[statistics$theme_name == theme,]$statistics_name))
 }
 
+update_stat_select_quantitative <- function(session, theme, input_select) {
+  updateSelectInput(session,
+                    input_select,
+                    choices = split(statistics[statistics$theme_name == theme & statistics$statistics_unit == 2,]$statistics_variable,
+                                    statistics[statistics$theme_name == theme & statistics$statistics_unit == 2,]$statistics_name))
+}
+
 # Map selection code
 add_to_map_selection <- function(click) {
   if(click$id %in% selected_locations) {
