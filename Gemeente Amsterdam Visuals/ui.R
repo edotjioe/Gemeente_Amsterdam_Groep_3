@@ -138,7 +138,7 @@ ui <- dashboardPage(
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         selectInput(
-          "neighbourhood_corr",
+          "district_corr",
           "Kies een stadsdeel:",
           choices = split(district_map$Stadsdeel_code, district_map$Stadsdeel),
           selected = "Centrum"
