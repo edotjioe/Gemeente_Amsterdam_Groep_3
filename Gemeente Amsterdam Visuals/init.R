@@ -99,18 +99,21 @@ create_corr_table <- function() {
   print("Merging correlations, statistics and locations...")
   
   district_locations <- data.frame(district_code = unique(locations$district_code), district_name = unique(locations$district_name))
+  statistics_list <- statistics[statistics$theme_name %in% correlation_themes,]
   
-  df <- data.frame(correlations[correlations$value > 0.8 | correlations$value < -0.8,])
-  df <- data.table(df[df$value < 1 & df$value > -1,])
+  df <- data.frame(correlations[correlations$value > -1 & correlations$value < 1,])
+  df <- data.frame(df[df$value > 0.7 | df$value < -0.7,])
+  df <- data.table(filter(df, df$statistics_1_id %in% statistics_list$statistics_id & df$statistics_2_id %in% statistics_list$statistics_id))
   
   df$value <- formatC(abs(df$value * 100000) / 1000, digits = 3)
-  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name")]), by.x = "statistics_1_id", by.y = "statistics_id", allow.cartesian = TRUE)
-  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name")]), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
+  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name", "theme_name")]), by.x = "statistics_1_id", by.y = "statistics_id", allow.cartesian = TRUE)
+  df <- merge(df, data.table(statistics[, c("statistics_id", "statistics_name", "theme_name")]), by.x = "statistics_2_id", by.y = "statistics_id", allow.cartesian = TRUE)
   df <- merge(df, data.table(district_locations), by = "district_code", allow.cartesian = TRUE)
   
   df <- data.frame(df)
   
-  selected_cols <- c("district_name", "statistics_name.x", "statistics_name.y", "value")
+  # selected_cols <- c("district_name", "statistics_name.x", "theme_name.x", "statistics_name.y", "theme_name.y","value")
+  selected_cols <- c("district_name", "statistics_name.x", "statistics_name.y","value")
   df <- df[, selected_cols]
 
   return(DT::renderDataTable(df,
@@ -121,6 +124,9 @@ create_corr_table <- function() {
 
 # Create environment variables
 print("Running init.R")
+correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 
+                             "Verkeer", "Werk", "Inkomen", "Onderwijs", "Welzijn en zorg", 
+                             "Wonen", "Openbare ruimte"))
 locations <- load_locations()
 statistics <- load_statistics()
 facts <- load_facts()
@@ -134,6 +140,4 @@ corr_table <- create_corr_table()
 facts_merged <- create_merge_facts()
 selected_district_corr_map <- "A"
 variableByTheme <- c()
-correlation_themes <- sort(c("Bevolking", "Bevolking leeftijd", "Veiligheid", 
-                             "Verkeer", "Werk", "Inkomen", "Onderwijs", "Welzijn en zorg", 
-                             "Wonen", "Openbare ruimte"))
+
