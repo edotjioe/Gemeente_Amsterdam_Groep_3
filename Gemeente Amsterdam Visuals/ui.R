@@ -25,12 +25,12 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme",
-          "Select theme",
+          "Kies een thema:",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat",
-          "Select statistic",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
         sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
@@ -88,12 +88,12 @@ ui <- dashboardPage(
         class = "filter-panel",
         selectInput(
           "theme_map_select",
-          "Selecteer thema",
+          "Kies een thema:",
           unique(statistics$theme_name)
         ),
         selectInput(
           "stat_map_select",
-          "Selecteer statistiek",
+          "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         )
       ),
