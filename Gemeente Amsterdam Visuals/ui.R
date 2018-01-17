@@ -44,7 +44,7 @@ ui <- dashboardPage(
         menuSubItem("Vergelijk stadsdeel", tabName = "stadsdeel"),
         menuSubItem("Vergelijk buurten", tabName = "chart"),
         menuSubItem("Vergelijk buurten met kaart", tabName = "compare_neighbourhoods"),
-        menuSubItem("Correlation", tabName = "Correlatie")
+        menuSubItem("Correlatie", tabName = "Correlation")
       ),
       # Compare district Filter Panel -----------------------------------------------------------------------------------
       conditionalPanel(
@@ -246,7 +246,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "Correlation",
         
-        h2("Correlation"),
+        h2("Correlatie"),
         fluidPage(
           column(
             5,
