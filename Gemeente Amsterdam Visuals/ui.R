@@ -249,17 +249,22 @@ ui <- dashboardPage(
         h2("Correlatie"),
         fluidPage(
           column(
-            5,
+            6,
+            box(
+              id = "corr_table",
+              width = 12,
+              
+              DT::dataTableOutput("corr_table_data")
+            ),
             box(
               id = "map_box",
               width = 12,
-              title = "",
               
               leafletOutput("mapSelectCorr", width = "100%")
             )
           ),
           column(
-            7,
+            6,
             box(
               id = "corr_graph_box_1",
               width = 12,

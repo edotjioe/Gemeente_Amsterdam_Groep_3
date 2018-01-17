@@ -69,7 +69,7 @@ render_select_map <- function(click) {
 get_facts_table <- function() {
   colNames <- c("Statestiek", "Buurt", "Jaar", "Waarde", "Eenheid")
   
-  return(DT::renderDataTable(facts_merged, filter = "top", options = list(pageLength = 50), colnames = colNames))
+  return(DT::renderDataTable(facts_merged, filter = "top", options = list(pageLength = 50), colnames = c("Statestiek", "Buurt", "Jaar", "Waarde", "Eenheid")))
 }
 
 # Comparing districts per theme (line graph)

@@ -95,8 +95,6 @@ server <- function(input, output, session) {
   )
   
   # Table
-  observeEvent(
-    TRUE,
-    output$datatable1 <- get_facts_table()
-  )
+  output$datatable1 <- facts_merged
+  output$corr_table_data <- corr_table
 }

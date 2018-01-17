@@ -125,5 +125,5 @@ correlations <- correlations[!is.na(correlations$value),]
 dbWriteTable(con, "correlations", correlations, overwrite = TRUE)
 
 # i = 514294 <- start there in the above for loop
-saveRDS(correlations, "intermediate.RDS")
-correlations <- readRDS("intermediate.RDS")
+#saveRDS(correlations, "intermediate.RDS")
+#correlations <- readRDS("intermediate.RDS")
