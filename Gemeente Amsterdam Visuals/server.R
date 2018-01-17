@@ -38,17 +38,17 @@ server <- function(input, output, session) {
     update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2")
   })
   
-  # ObserveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "neighbourhood_corr"
+  # ObserveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "district_corr"
   observeEvent({
-    input$neighbourhood_corr
+    input$district_corr
   }, {
-    if(!is.na(input$neighbourhood_corr)) {
-       update_correlation_map(input$neighbourhood_corr)
+    if(!is.na(input$district_corr)) {
+       update_correlation_map(input$district_corr)
     }
     
-    output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
-    output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
-    output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
+    output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
+    output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
+    output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
   })
 
   # OberveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "mapSelectCorr_shape_click"
