@@ -128,9 +128,14 @@ pal <- load_color_scheme()
 leaflet_map_index <- create_various_variables()
 selected_locations <- c()
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 facts_merged <- create_merge_facts()
 corr_table <- create_corr_table()
 selected_neighbourhood_corr_map <- "F81e"
+=======
+#facts_merged <- create_merge_facts()
+selected_district_corr_map <- "A"
+>>>>>>> Stashed changes
 =======
 #facts_merged <- create_merge_facts()
 selected_district_corr_map <- "A"

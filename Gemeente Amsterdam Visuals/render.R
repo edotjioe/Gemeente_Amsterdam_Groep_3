@@ -157,6 +157,7 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
         value = sum(value)
       ) %>%
       as.data.frame()
+<<<<<<< Updated upstream
     
     statistic_two_df <- facts %>%
       filter(statistics_id == statistic_id_two) %>%
@@ -171,6 +172,22 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
     str(statistic_one_df)
     print(statistic_two_df)
     
+=======
+    
+    statistic_two_df <- facts %>%
+      filter(statistics_id == statistic_id_two) %>%
+      filter(locations_id %in% neighbourhood_ids$locations_id) %>%
+      group_by(year) %>%
+      summarise(
+        value = sum(value)
+      ) %>%
+      as.data.frame()
+
+    print(neighbourhood_ids)
+    str(statistic_one_df)
+    print(statistic_two_df)
+    
+>>>>>>> Stashed changes
     # statistic_one_df <- facts[facts$statistics_id == statistic_id_one & facts$locations_id == neighbourhood_id, c(4, 5)]
     # statistic_two_df <- facts[facts$statistics_id == statistic_id_two & facts$locations_id == neighbourhood_id, c(4, 5)]
 
