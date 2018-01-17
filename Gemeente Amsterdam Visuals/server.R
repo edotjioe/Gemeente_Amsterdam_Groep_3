@@ -57,7 +57,7 @@ server <- function(input, output, session) {
   }, {
     click <- input$mapSelectCorr_shape_click
     if(click$id != selected_district_corr_map) {
-      updateSelectInput(session = session, inputId = "neighbourhood_corr", selected = click$id)
+      updateSelectInput(session = session, inputId = "district_corr", selected = click$id)
     }
   })
   
@@ -66,9 +66,9 @@ server <- function(input, output, session) {
     input$stat_corr_select_1
     input$stat_corr_select_2
   }, {
-    output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
-    output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
-    output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$neighbourhood_corr)
+    output$corr_graph_1 <- render_graph3(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
+    output$corr_graph_2 <- render_graph4(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
+    output$corr_message <- get_corr_message(input$stat_corr_select_1, input$stat_corr_select_2, input$district_corr)
   })
   
   # ObserveEvent for updating the graph at "Vergelijk stadsdeel" page
