@@ -33,7 +33,7 @@ ui <- dashboardPage(
           "Kies een statistiek:",
           choices = c("Bevolking totaal" = "BEVTOTAAL")
         ),
-        sliderInput("year", "Select year", 2005, 2017, 2017, step = 1, sep = "")
+        sliderInput("year", "Kies een jaar:", 2005, 2017, 2017, step = 1, sep = "")
       ),
       menuItem(
         "Grafieken",
