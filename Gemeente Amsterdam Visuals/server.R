@@ -77,7 +77,7 @@ server <- function(input, output, session) {
     input$stadsdeel2C
   }, output$stadsdeelchart2 <- render_graph2(input$themaC, input$stadsdeel1C, input$stadsdeel2C))
   
-  # Table
+  # Tables
   output$datatable1 <- get_facts_table()
   
   # Dashboard Buttons
