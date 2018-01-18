@@ -77,11 +77,11 @@ render_graph <- function(theme, district_one, district_two) {
     theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-
+    
     factscompare <- facts %>%
       filter(statistics_id == as.numeric(theme_id)) %>%
       select(value, statistics_id, locations_id, year)
-
+    
     chart_data <- factscompare %>% 
       inner_join(locations, by = "locations_id") %>%
       inner_join(statistics, by = "statistics_id") %>%
@@ -111,7 +111,7 @@ render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
     theme_id <- statistics %>%
       filter(statistics_variable == theme) %>%
       select(statistics_id)
-
+    
     factscompare <- facts %>%
       filter(statistics_id == as.numeric(theme_id)) %>%
       select(value, statistics_id, locations_id, year)
@@ -123,12 +123,13 @@ render_graph2 <- function(theme, neighbourhood_one, neighbourhood_two) {
     neighbourhood_data_one <- chart_data %>%
       filter(neighbourhood_name == neighbourhood_one)
     neighbourhood_data_two <- chart_data %>%
-      filter(neighbourhood_name == neighbourhood_two)
+      filter(neighbourhood_name == neighbourhood_t
+             wo)
     
     return(
       plot_ly(x = neighbourhood_data_one$year, y = neighbourhood_data_one$value, name = neighbourhood_data_one$neighbourhood_name, type = 'scatter', mode = 'lines') %>%
-      add_trace(x = neighbourhood_data_two$year, y = neighbourhood_data_two$value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
-      config(displayModeBar = FALSE))
+        add_trace(x = neighbourhood_data_two$year, y = neighbourhood_data_two$value, name = neighbourhood_data_two$neighbourhood_name, mode = 'lines') %>%
+        config(displayModeBar = FALSE))
   })
   
   return(plot)
@@ -159,15 +160,15 @@ render_graph3 <- function(statistic_one, statistic_two, location) {
         value = sum(value)
       ) %>%
       as.data.frame()
-
+    
     statistic_name_one <- statistics[statistics$statistics_variable == statistic_one, "statistics_name"]
     statistic_name_two <- statistics[statistics$statistics_variable == statistic_two, "statistics_name"]
-
+    
     return(
-         plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_name_one, type = 'scatter', mode = 'lines') %>%
-         add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_name_two, mode = 'lines') %>%
-         layout(legend = list(orientation = 'h'), title = "Vergelijking lijngrafiek")
-       )
+      plot_ly(x = statistic_one_df$year, y = statistic_one_df$value, name = statistic_name_one, type = 'scatter', mode = 'lines') %>%
+        add_trace(x = statistic_two_df$year, y = statistic_two_df$value, name = statistic_name_two, mode = 'lines') %>%
+        layout(legend = list(orientation = 'h'), title = "Vergelijking lijngrafiek")
+    )
   })
   return(plot)
 }
@@ -210,7 +211,7 @@ render_graph4 <- function(statistic_one, statistic_two, location) {
     
     return(
       plot_ly(x = statistic_one_df$value, y = statistic_two_df$value, type = 'scatter') %>%
-      layout(xaxis = statistic_name_one, yaxis = statistic_name_two, title = "Correlatie grafiek")
+        layout(xaxis = statistic_name_one, yaxis = statistic_name_two, title = "Correlatie grafiek")
     )
   })
   return(plot)
@@ -224,7 +225,8 @@ correlation_map <- function() {
     addTiles(group = "OSM",
              options = providerTileOptions(minZoom = 10, maxZoom = 26)) %>%
     addPolygons(
-      stroke = TRUE,
+      stroke = TRU
+      E,
       weight = 2,
       smoothFactor = 1,
       fillOpacity = 0.7,
@@ -236,9 +238,9 @@ correlation_map <- function() {
       ),
       label = paste(district_map$Stadsdeel),
       layerId = ~ Stadsdeel_code
-     ) %>%
-     removeShape(layerId = selected_district_corr_map) %>%
-     addPolygons(layerId = selected_district_corr_map,
+    ) %>%
+    removeShape(layerId = selected_district_corr_map) %>%
+    addPolygons(layerId = selected_district_corr_map,
                 fillColor = "red",
                 data = district_map[leaflet_map_index,],
                 stroke = TRUE,
@@ -257,10 +259,10 @@ correlation_map <- function() {
 
 update_correlation_map <- function(code) {
   new_selected_district_map <- code
-
+  
   leaflet_map_index_new <- as.numeric(match(new_selected_district_map, district_map$Stadsdeel_code))
   leaflet_map_index <- as.numeric(match(selected_district_corr_map, district_map$Stadsdeel_code))
-
+  
   leafletProxy("mapSelectCorr") %>%
     removeShape(layerId = selected_district_corr_map) %>%
     removeShape(layerId = new_selected_district_map) %>%
@@ -290,7 +292,7 @@ update_correlation_map <- function(code) {
                                                     bringToFront = TRUE),
                 label = paste(district_map[leaflet_map_index_new,]$Stadsdeel)
     )
-
+  
   assign("selected_district_corr_map", new_selected_district_map, envir = globalenv())
 }
 
@@ -381,18 +383,16 @@ get_corr_message <- function(stat1, stat2, district_code) {
   if(stat1 == stat2) {
     return(renderText("Selecteer twee verschillende statistieken om te vergelijken"))
   }
-
+  
   stat1_row <- statistics[statistics$statistics_variable == stat1,]
   stat2_row <- statistics[statistics$statistics_variable == stat2,]
-
   
-  corr <- correlations[which(correlations$statistics_1_id == stat1_row$statistics_id & 
-                               correlations$statistics_2_id == stat2_row$statistics_id &
-                               correlations$district_code == district_code),] 
+  corr <- correlations[which(correlations$statistics_1_id == stat1_row$statistics_id &
+                               correlations$statistics_2_id == stat2_row$statistics_id | correlations$statistics_1_id == stat2_row$statistics_id & 
+                               correlations$statistics_2_id == stat1_row$statistics_id),] 
   
-  district_name <- as.character(unique(locations[locations$district_code == district_code, "district_name"]))
-
-  print(district_name)
+  corr <- corr[corr$district_code == district_code,]
+  
   if(nrow(corr) == 0) {
     return(renderText(
       paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "in stadsdeel",
