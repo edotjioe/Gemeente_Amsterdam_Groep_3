@@ -387,9 +387,12 @@ get_corr_message <- function(stat1, stat2, district_code) {
 
   
   corr <- correlations[which(correlations$statistics_1_id == stat1_row$statistics_id & 
-                               correlations$statistics_2_id == stat2_row$statistics_id &
-                               correlations$district_code == district_code),] 
-
+                               correlations$statistics_2_id == stat2_row$statistics_id | correlations$statistics_1_id == stat2_row$statistics_id & 
+                               correlations$statistics_2_id == stat1_row$statistics_id),] 
+  
+  
+  corr <- corr[corr$district_code == district_code,]
+  
   if(nrow(corr) == 0) {
     return(renderText(
       paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))

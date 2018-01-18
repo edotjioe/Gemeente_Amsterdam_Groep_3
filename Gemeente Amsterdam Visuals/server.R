@@ -31,12 +31,12 @@ server <- function(input, output, session) {
   # ObserveEvent for updating the variable list by theme at "Correlatie" page
   observeEvent({
     input$theme_corr_select_1
-    input$theme_corr_select_2
   }, 
   {
     update_stat_select_quantitative(session, input$theme_corr_select_1, "stat_corr_select_1")
-    update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2")
   })
+  
+  observeEvent(input$theme_corr_select_2, update_stat_select_quantitative(session, input$theme_corr_select_2, "stat_corr_select_2"))
   
   # ObserveEvent for updating the map, selectInput and graphs at "Correlatie" page by selectInput "district_corr"
   observeEvent({
