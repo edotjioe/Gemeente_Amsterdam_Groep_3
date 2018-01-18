@@ -393,16 +393,22 @@ get_corr_message <- function(stat1, stat2, district_code) {
   
   corr <- corr[corr$district_code == district_code,]
   
+  district_name <- as.character(unique(locations[locations$district_code == district_code, "district_name"]))
+  
+  print(district_name)
   if(nrow(corr) == 0) {
     return(renderText(
-      paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "kan geen correlatie berekend worden")))
+      paste("Voor", stat1_row$statistics_name, "en", stat2_row$statistics_name, "in stadsdeel",
+            district_name,"kan geen correlatie voor berekend worden")))
   }
   
   if(corr$value >= 0.8) {
     return(renderText(
-      paste(stat1_row$statistics_name, "en", stat2_row$statistics_name, "hebben een verband met elkaar")))
+      paste(stat1_row$statistics_name, "en", stat2_row$statistics_name, "in stadsdeel",
+            district_name, "hebben een verband met elkaar")))
   } else {
     return(renderText(
-      paste("Er is geen verband tussen", stat1_row$statistics_name, "en", stat2_row$statistics_name)))
+      paste("Er is geen verband tussen", stat1_row$statistics_name, "en", stat2_row$statistics_name, "in stadsdeel",
+            district_name)))
   }
 }
